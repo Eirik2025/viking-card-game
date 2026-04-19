@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collection</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/collection.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🃏 Collection</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="collection.html" class="active">Collection</a></li>
+            <li><a href="holmgang.html">Holmgang</a></li>
+            <li><a href="kingdoms.html">Kingdoms</a></li>
+        </ul>
+        <div class="user-menu">
+            <button class="btn btn-secondary" onclick="signOut()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="collection-header">
+            <h1>Your Collection</h1>
+            <div class="collection-stats">
+                <span id="card-count">0 cards</span>
+                <span id="unique-count">0 unique</span>
+            </div>
+        </div>
+
+        <div class="collection-filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="character">Characters</button>
+            <button class="filter-btn" data-filter="artifact">Artifacts</button>
+            <button class="filter-btn" data-filter="spell">Spells</button>
+            <button class="filter-btn" data-filter="weapon">Weapons</button>
+        </div>
+
+        <div class="rarity-filters">
+            <label>Rarity:</label>
+            <button class="rarity-btn active" data-rarity="all">All</button>
+            <button class="rarity-btn common" data-rarity="common">Common</button>
+            <button class="rarity-btn rare" data-rarity="rare">Rare</button>
+            <button class="rarity-btn epic" data-rarity="epic">Epic</button>
+            <button class="rarity-btn legendary" data-rarity="legendary">Legendary</button>
+        </div>
+
+        <div id="cards-grid" class="cards-grid"></div>
+    </div>
+
+    <div id="card-modal" class="modal hidden">
+        <div class="modal-content card-detail">
+            <button class="close-btn" onclick="closeCardModal()">×</button>
+            <div id="modal-image" class="modal-image"></div>
+            <h2 id="modal-name"></h2>
+            <span id="modal-rarity" class="rarity-badge"></span>
+            <p id="modal-lore"></p>
+            <div id="modal-stats" class="modal-stats"></div>
+        </div>
+    </div>
+
+    <script type="module" src="js/supabase-client.js"></script>
+<script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/collection.js"></script>
+</body>
+</html>

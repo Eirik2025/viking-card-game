@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battle</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/battle.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="battle-container">
+        <div class="battle-header">
+            <div class="player-info">
+                <h2 id="player-name">You</h2>
+                <div class="health-bar">
+                    <div id="player-health-bar" class="health-fill" style="width: 100%"></div>
+                    <span id="player-health">20/20</span>
+                </div>
+            </div>
+            <div class="battle-timer">⏱️ <span id="timer">60</span></div>
+            <div class="player-info">
+                <h2 id="opponent-name">Opponent</h2>
+                <div class="health-bar">
+                    <div id="opponent-health-bar" class="health-fill" style="width: 100%"></div>
+                    <span id="opponent-health">20/20</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="battle-field">
+            <div class="field-side player-side">
+                <div class="card-slot" id="player-active"></div>
+            </div>
+            <div class="vs-indicator">VS</div>
+            <div class="field-side opponent-side">
+                <div class="card-slot" id="opponent-active"></div>
+            </div>
+        </div>
+
+        <div class="battle-controls">
+            <div class="health-controls">
+                <h3>Health Control</h3>
+                <div class="control-group">
+                    <button class="btn btn-health" onclick="adjustHealth('player', 1)">+1</button>
+                    <button class="btn btn-health" onclick="adjustHealth('player', 5)">+5</button>
+                    <button class="btn btn-health btn-danger" onclick="adjustHealth('player', -1)">-1</button>
+                    <button class="btn btn-health btn-danger" onclick="adjustHealth('player', -5)">-5</button>
+                </div>
+            </div>
+
+            <div class="dice-controls">
+                <h3>Dice Roller</h3>
+                <div class="dice-buttons">
+                    <button class="btn btn-dice" onclick="rollDice(4)">d4</button>
+                    <button class="btn btn-dice" onclick="rollDice(6)">d6</button>
+                    <button class="btn btn-dice" onclick="rollDice(8)">d8</button>
+                    <button class="btn btn-dice" onclick="rollDice(10)">d10</button>
+                    <button class="btn btn-dice" onclick="rollDice(12)">d12</button>
+                    <button class="btn btn-dice" onclick="rollDice(20)">d20</button>
+                </div>
+                <div id="dice-result" class="dice-result">-</div>
+            </div>
+
+            <div class="coin-flip">
+                <h3>Coin Flip</h3>
+                <button class="btn btn-primary" onclick="flipCoin()">Flip Coin</button>
+                <div id="coin-result" class="coin-result">-</div>
+            </div>
+        </div>
+
+        <div class="battle-chat">
+            <div id="battle-messages" class="battle-messages"></div>
+            <div class="chat-input">
+                <input type="text" id="battle-chat-input" placeholder="Battle chat...">
+                <button onclick="sendBattleMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/supabase-client.js"></script>
+<script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/battle.js"></script>
+</body>
+</html>

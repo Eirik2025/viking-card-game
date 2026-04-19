@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News & Teasers</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/news.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">📰 News</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="news.html" class="active">News</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div id="admin-panel" class="admin-panel hidden">
+            <h2>Create Post</h2>
+            <select id="post-category">
+                <option value="update">Update</option>
+                <option value="teaser">Teaser</option>
+                <option value="announcement">Announcement</option>
+                <option value="patch">Patch Notes</option>
+            </select>
+            <input type="text" id="post-title" placeholder="Title">
+            <textarea id="post-content" placeholder="Content..." rows="5"></textarea>
+            <div class="post-options">
+                <label><input type="checkbox" id="pin-post"> Pin to top</label>
+                <label><input type="checkbox" id="publish-post" checked> Publish immediately</label>
+            </div>
+            <button onclick="createPost()" class="btn btn-primary">Post</button>
+        </div>
+
+        <div class="news-filters">
+            <button class="filter active" data-filter="all">All</button>
+            <button class="filter" data-filter="update">Updates</button>
+            <button class="filter" data-filter="teaser">Teasers</button>
+            <button class="filter" data-filter="announcement">Announcements</button>
+            <button class="filter" data-filter="patch">Patch Notes</button>
+        </div>
+
+        <div id="news-feed" class="news-feed">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <script type="module" src="js/supabase-client.js"></script>
+<script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/news.js"></script>
+</body>
+</html>

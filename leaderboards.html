@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboards</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/leaderboards.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🏆 Leaderboards</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="leaderboards.html" class="active">Leaderboards</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="leaderboard-tabs">
+            <button class="lb-tab active" data-board="wins">Most Wins</button>
+            <button class="lb-tab" data-board="level">Highest Level</button>
+            <button class="lb-tab" data-board="prestige">Prestige</button>
+        </div>
+
+        <div class="podium">
+            <div class="podium-place second">
+                <div class="podium-avatar">🥈</div>
+                <div class="podium-name" id="p2-name">-</div>
+                <div class="podium-score" id="p2-score">-</div>
+            </div>
+            <div class="podium-place first">
+                <div class="podium-avatar">🥇</div>
+                <div class="podium-name" id="p1-name">-</div>
+                <div class="podium-score" id="p1-score">-</div>
+            </div>
+            <div class="podium-place third">
+                <div class="podium-avatar">🥉</div>
+                <div class="podium-name" id="p3-name">-</div>
+                <div class="podium-score" id="p3-score">-</div>
+            </div>
+        </div>
+
+        <div id="leaderboard-table" class="leaderboard-table">
+            <!-- Populated by JS -->
+        </div>
+    </div>
+
+    <script type="module" src="js/supabase-client.js"></script>
+<script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/leaderboards.js"></script>
+</body>
+</html>

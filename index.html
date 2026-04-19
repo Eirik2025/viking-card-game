@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Viking Card Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/home.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">⚔️ Viking Cards</div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="holmgang.html">Holmgang</a></li>
+            <li><a href="kingdoms.html">Kingdoms</a></li>
+            <li><a href="tournaments.html">Tournaments</a></li>
+            <li><a href="friends.html">Friends</a></li>
+            <li><a href="leaderboards.html">Leaderboards</a></li>
+            <li><a href="news.html">News</a></li>
+            <li><a href="lore.html">Lore</a></li>
+        </ul>
+        <div class="user-menu">
+            <span id="username">Warrior</span>
+            <button class="btn btn-secondary" onclick="signOut()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-banner">
+            <h1>Welcome to the Arena, <span id="welcome-name">Warrior</span></h1>
+            <p>Choose your path to glory</p>
+        </div>
+
+        <div class="feature-grid">
+            <a href="battle.html" class="feature-card">
+                <div class="feature-icon">⚔️</div>
+                <h3>Find Battle</h3>
+                <p>Challenge other warriors</p>
+            </a>
+            <a href="kingdoms.html" class="feature-card">
+                <div class="feature-icon">🏰</div>
+                <h3>Kingdoms</h3>
+                <p>Join a clan or forge your own</p>
+            </a>
+            <a href="collection.html" class="feature-card">
+                <div class="feature-icon">🃏</div>
+                <h3>Collection</h3>
+                <p>Manage your cards & decks</p>
+            </a>
+            <a href="holmgang.html" class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>Holmgang</h3>
+                <p>High stakes arena</p>
+            </a>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="quick-links">
+                <h2>Quick Access</h2>
+                <div class="quick-buttons">
+                    <a href="friends.html" class="btn btn-secondary">👥 Friends</a>
+                    <a href="leaderboards.html" class="btn btn-secondary">🏆 Rankings</a>
+                    <a href="profile.html" class="btn btn-secondary">👤 Profile</a>
+                </div>
+            </div>
+
+            <div class="leaderboard-section">
+                <h2>Leaderboards</h2>
+                <div class="tabs">
+                    <button class="tab-btn active" data-period="24h">24h Wins</button>
+                    <button class="tab-btn" data-period="7d">7 Days</button>
+                    <button class="tab-btn" data-period="30d">30 Days</button>
+                </div>
+                <div id="leaderboard-content" class="leaderboard-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/supabase-client.js"></script>
+<script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/home.js"></script>
+</body>
+</html>

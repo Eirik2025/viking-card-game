@@ -1,0 +1,162 @@
+.collection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--primary);
+}
+
+.collection-stats {
+    display: flex;
+    gap: 1.5rem;
+    color: var(--text-muted);
+}
+
+.collection-filters, .rarity-filters {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-btn, .rarity-btn {
+    padding: 0.5rem 1rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    border-radius: 20px;
+    font-family: inherit;
+}
+
+.filter-btn.active, .rarity-btn.active {
+    background: var(--primary);
+    color: var(--dark);
+    border-color: var(--primary);
+}
+
+.rarity-btn.common { border-color: #a0a0a0; }
+.rarity-btn.rare { border-color: #4a90e2; color: #4a90e2; }
+.rarity-btn.epic { border-color: #9b59b6; color: #9b59b6; }
+.rarity-btn.legendary { border-color: gold; color: gold; }
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.5rem;
+}
+
+.card-item {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.card-item:hover {
+    transform: translateY(-5px);
+}
+
+.card-item.common { border-color: #a0a0a0; }
+.card-item.rare { border-color: #4a90e2; }
+.card-item.epic { border-color: #9b59b6; }
+.card-item.legendary { border-color: gold; box-shadow: 0 0 15px rgba(255,215,0,0.2); }
+
+.card-image {
+    height: 140px;
+    background: linear-gradient(135deg, var(--secondary), var(--dark));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+}
+
+.card-info {
+    padding: 1rem;
+}
+
+.card-name {
+    font-weight: bold;
+    color: var(--primary);
+    margin-bottom: 0.25rem;
+}
+
+.card-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.rarity-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.rarity-badge.common { background: #666; color: white; }
+.rarity-badge.rare { background: #4a90e2; color: white; }
+.rarity-badge.epic { background: #9b59b6; color: white; }
+.rarity-badge.legendary { background: gold; color: black; }
+
+.card-detail {
+    max-width: 500px;
+    text-align: center;
+}
+
+.modal-image {
+    height: 250px;
+    background: linear-gradient(135deg, var(--secondary), var(--dark));
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+}
+
+.modal-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.stat-box {
+    background: rgba(0,0,0,0.2);
+    padding: 0.75rem;
+    border-radius: 8px;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.25rem;
+    color: var(--primary);
+    font-weight: bold;
+}
+
+.close-btn {
+    float: right;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+}

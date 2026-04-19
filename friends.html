@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friends</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/friends.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">👥 Friends</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="friends.html" class="active">Friends</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="friends-layout">
+            <div class="friends-sidebar">
+                <div class="search-box">
+                    <input type="text" id="find-player" placeholder="Find players...">
+                    <button onclick="searchPlayers()" class="btn btn-primary">Search</button>
+                </div>
+                
+                <div class="friends-tabs">
+                    <button class="tab-btn active" data-tab="friends">Friends</button>
+                    <button class="tab-btn" data-tab="requests">Requests</button>
+                    <button class="tab-btn" data-tab="messages">Messages</button>
+                </div>
+
+                <div id="tab-content" class="tab-content">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div id="chat-panel" class="chat-panel hidden">
+                <div class="chat-header">
+                    <h3 id="chat-with">Select a friend</h3>
+                    <button class="btn btn-secondary" onclick="challengeFriend()">⚔️ Challenge</button>
+                </div>
+                <div id="private-messages" class="private-messages"></div>
+                <div class="chat-input-area">
+                    <input type="text" id="private-input" placeholder="Message...">
+                    <button onclick="sendPrivateMessage()" class="btn btn-primary">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/supabase-client.js"></script>
+<script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/friends.js"></script>
+</body>
+</html>

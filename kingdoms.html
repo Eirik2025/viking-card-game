@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kingdoms</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/kingdoms.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🏰 Kingdoms</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="kingdoms.html" class="active">Kingdoms</a></li>
+            <li><a href="tournaments.html">Tournaments</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="kingdoms-layout">
+            <div class="kingdom-list-section">
+                <h2>Kingdoms</h2>
+                <div class="kingdom-actions">
+                    <button id="create-kingdom-btn" class="btn btn-primary">Create Kingdom</button>
+                    <input type="text" id="search-kingdoms" placeholder="Search kingdoms...">
+                </div>
+                <div id="kingdoms-list" class="kingdoms-list">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <div id="kingdom-detail" class="kingdom-detail hidden">
+                <div class="kingdom-header">
+                    <h1 id="kingdom-name">Kingdom Name</h1>
+                    <span id="kingdom-tag" class="tag">[TAG]</span>
+                </div>
+                
+                <div class="kingdom-stats">
+                    <div class="stat">
+                        <span class="stat-label">Members</span>
+                        <span id="member-count" class="stat-value">0/50</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Total XP</span>
+                        <span id="kingdom-xp" class="stat-value">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Wars Won</span>
+                        <span id="wars-won" class="stat-value">0</span>
+                    </div>
+                </div>
+
+                <div class="members-section">
+                    <h3>Members</h3>
+                    <div id="members-list" class="members-list"></div>
+                </div>
+
+                <div class="kingdom-chat">
+                    <h3>Kingdom Chat</h3>
+                    <div id="chat-messages" class="chat-messages"></div>
+                    <div class="chat-input">
+                        <input type="text" id="chat-input" placeholder="Send message...">
+                        <button id="send-chat" class="btn btn-primary">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="create-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Create Kingdom</h2>
+                <input type="text" id="new-kingdom-name" placeholder="Kingdom Name">
+                <input type="text" id="new-kingdom-tag" placeholder="Tag (3-4 chars)" maxlength="4">
+                <button id="confirm-create" class="btn btn-primary">Create (💰 5000)</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/supabase-client.js"></script>
+<script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/kingdoms.js"></script>
+</body>
+</html>

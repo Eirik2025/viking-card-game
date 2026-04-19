@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Lore</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/lore.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">📚 Lore</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="lore.html" class="active">Lore</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="lore-search">
+            <input type="text" id="lore-search" placeholder="Search cards, characters, artifacts...">
+            <button onclick="searchLore()" class="btn btn-primary">Search</button>
+        </div>
+
+        <div class="lore-categories">
+            <button class="lore-cat active" data-cat="all">All</button>
+            <button class="lore-cat" data-cat="character">Characters</button>
+            <button class="lore-cat" data-cat="artifact">Artifacts</button>
+            <button class="lore-cat" data-cat="location">Locations</button>
+            <button class="lore-cat" data-cat="event">Events</button>
+        </div>
+
+        <div id="lore-grid" class="lore-grid">
+            <!-- Populated by JS -->
+        </div>
+
+        <div id="lore-modal" class="modal hidden">
+            <div class="modal-content lore-detail">
+                <button class="close-btn" onclick="closeLore()">×</button>
+                <h2 id="lore-title"></h2>
+                <div id="lore-image" class="lore-image"></div>
+                <div id="lore-text" class="lore-text"></div>
+                <div id="lore-stats" class="lore-stats"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/supabase-client.js"></script>
+<script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/lore.js"></script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+.leaderboard-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.lb-tab {
+    padding: 1rem 2rem;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid var(--border);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 1.1rem;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.lb-tab.active {
+    background: var(--primary);
+    color: var(--dark);
+    border-color: var(--primary);
+}
+
+.podium {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 2rem;
+    margin: 3rem 0;
+    height: 300px;
+}
+
+.podium-place {
+    text-align: center;
+    width: 200px;
+}
+
+.podium-place.first {
+    order: 2;
+    margin-bottom: 50px;
+}
+
+.podium-place.second {
+    order: 1;
+    margin-bottom: 25px;
+}
+
+.podium-place.third {
+    order: 3;
+}
+
+.podium-avatar {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.podium-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.podium-score {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+}
+
+.leaderboard-table {
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.lb-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 150px 150px;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+}
+
+.lb-row.header {
+    background: rgba(0,0,0,0.3);
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.lb-rank {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.lb-rank.top-3 {
+    color: var(--primary);
+}
+
+.prestige-badge {
+    background: linear-gradient(45deg, gold, orange);
+    color: black;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-weight: bold;
+    display: inline-block;
+}

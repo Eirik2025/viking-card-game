@@ -1,0 +1,107 @@
+.tournament-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--primary);
+}
+
+.tournament-filters {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    font-family: inherit;
+    border-radius: 4px;
+}
+
+.filter-btn.active {
+    background: var(--primary);
+    color: var(--dark);
+}
+
+.tournaments-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.tournament-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s;
+}
+
+.tournament-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.tournament-status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.status-open { background: var(--success); color: var(--dark); }
+.status-active { background: var(--warning); color: var(--dark); }
+.status-completed { background: var(--text-muted); color: white; }
+
+.tournament-info {
+    margin: 1rem 0;
+}
+
+.tournament-info div {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.5rem 0;
+    color: var(--text-muted);
+}
+
+.tournament-info span:last-child {
+    color: var(--text);
+    font-weight: bold;
+}
+
+.bracket {
+    margin-top: 2rem;
+    overflow-x: auto;
+}
+
+.bracket-round {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    margin-right: 2rem;
+}
+
+.match {
+    background: rgba(255,255,255,0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 0.5rem 0;
+    min-width: 200px;
+}
+
+.match-player {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+}
+
+.match-winner {
+    color: var(--success);
+    font-weight: bold;
+}

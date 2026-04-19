@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/collection.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">👤 Profile</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="profile.html" class="active">Profile</a></li>
+        </ul>
+        <div class="user-menu">
+            <button class="btn btn-secondary" onclick="signOut()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="collection-header">
+            <h1 id="profile-name">Warrior</h1>
+        </div>
+        <div class="modal-stats" id="profile-stats"></div>
+    </div>
+
+    <script type="module" src="js/supabase-client.js"></script>
+<script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/auth-guard.js"></script>
+    <script type="module">
+        import { supabase, getCurrentUser, signOut } from './supabase-client.js';
+        window.signOut = signOut;
+        
+        async function loadProfile() {
+            const user = await getCurrentUser();
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+            
+            document.getElementById('profile-name').textContent = profile.username;
+            const stats = {
+                Level: profile.level,
+                Experience: profile.experience,
+                Prestige: profile.prestige_level,
+                Wins: profile.total_wins,
+                Gold: profile.gold
+            };
+            
+            document.getElementById('profile-stats').innerHTML = Object.entries(stats).map(([k,v]) => `
+                <div class="stat-box">
+                    <span class="stat-label">${k}</span>
+                    <span class="stat-value">${v}</span>
+                </div>
+            `).join('');
+        }
+        loadProfile();
+    </script>
+</body>
+</html>

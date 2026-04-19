@@ -1,0 +1,114 @@
+.admin-panel {
+    background: rgba(201, 162, 39, 0.1);
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.admin-panel input, .admin-panel textarea, .admin-panel select {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 4px;
+    font-family: inherit;
+}
+
+.post-options {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1rem;
+}
+
+.post-options label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.news-filters {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.filter {
+    padding: 0.5rem 1rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    border-radius: 20px;
+    font-family: inherit;
+}
+
+.filter.active {
+    background: var(--primary);
+    color: var(--dark);
+}
+
+.news-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.news-item {
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 2rem;
+    border-left: 4px solid var(--primary);
+    transition: all 0.3s;
+}
+
+.news-item:hover {
+    transform: translateX(5px);
+}
+
+.news-item.pinned {
+    border-left-color: var(--accent);
+    background: rgba(233, 69, 96, 0.05);
+}
+
+.news-category {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+
+.cat-update { background: var(--success); color: var(--dark); }
+.cat-teaser { background: purple; color: white; }
+.cat-announcement { background: var(--primary); color: var(--dark); }
+.cat-patch { background: var(--secondary); color: white; }
+
+.news-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+}
+
+.news-meta {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.news-content {
+    line-height: 1.6;
+    color: var(--text);
+}
+
+.pin-icon {
+    float: right;
+    color: var(--accent);
+    font-size: 1.2rem;
+}

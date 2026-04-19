@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournaments</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/tournaments.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🏆 Tournaments</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="tournaments.html" class="active">Tournaments</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="tournament-header">
+            <h1>Tournament Hall</h1>
+            <button id="create-tournament-btn" class="btn btn-primary">Host Tournament</button>
+        </div>
+
+        <div class="tournaments-grid">
+            <div class="tournament-filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="open">Open</button>
+                <button class="filter-btn" data-filter="active">In Progress</button>
+                <button class="filter-btn" data-filter="completed">Completed</button>
+            </div>
+
+            <div id="tournaments-list" class="tournaments-list">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <div id="tournament-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Create Tournament</h2>
+                <input type="text" id="tour-name" placeholder="Tournament Name">
+                <select id="tour-type">
+                    <option value="single">Single Elimination</option>
+                    <option value="double">Double Elimination</option>
+                    <option value="round">Round Robin</option>
+                </select>
+                <input type="number" id="tour-max" placeholder="Max Players" min="4" max="64" value="16">
+                <input type="number" id="tour-fee" placeholder="Entry Fee" value="100">
+                <button id="confirm-tournament" class="btn btn-primary">Create</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/supabase-client.js"></script>
+<script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/tournaments.js"></script>
+</body>
+</html>

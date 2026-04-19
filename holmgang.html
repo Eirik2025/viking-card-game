@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holmgang Arena</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/holmgang.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">🛡️ Holmgang</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="holmgang.html" class="active">Holmgang</a></li>
+            <li><a href="kingdoms.html">Kingdoms</a></li>
+            <li><a href="tournaments.html">Tournaments</a></li>
+        </ul>
+        <div class="user-menu">
+            <span id="user-gold">💰 1000</span>
+            <button class="btn btn-secondary" onclick="signOut()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="arena-header">
+            <h1>Holmgang Arena</h1>
+            <p>High-stakes duels. Winner takes all.</p>
+        </div>
+
+        <div class="arena-grid">
+            <div class="entry-section">
+                <h2>Enter the Arena</h2>
+                <div class="fee-display">
+                    <span>Entry Fee:</span>
+                    <span class="fee-amount">💰 500 Gold</span>
+                </div>
+                <button id="enter-arena" class="btn btn-primary btn-large">Enter Arena</button>
+                <p class="warning-text">⚠️ Entry fee is non-refundable</p>
+            </div>
+
+            <div class="deck-section">
+                <h2>Your Deck</h2>
+                <div id="deck-slots" class="deck-grid">
+                    <!-- Deck building interface -->
+                </div>
+                <button id="save-deck" class="btn btn-secondary">Save Deck</button>
+            </div>
+
+            <div class="rewards-section">
+                <h2>Reward Tiers</h2>
+                <div class="tier-list">
+                    <div class="tier tier-1">
+                        <span class="tier-wins">0-2 Wins</span>
+                        <span class="tier-reward">50% Entry Fee Return</span>
+                    </div>
+                    <div class="tier tier-2">
+                        <span class="tier-wins">3-4 Wins</span>
+                        <span class="tier-reward">150% Return + Common Card</span>
+                    </div>
+                    <div class="tier tier-3">
+                        <span class="tier-wins">5-6 Wins</span>
+                        <span class="tier-reward">300% Return + Rare Card</span>
+                    </div>
+                    <div class="tier tier-4">
+                        <span class="tier-wins">7 Wins</span>
+                        <span class="tier-reward">1000% Return + Legendary Card</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="match-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Match Found!</h2>
+                <p>Opponent: <span id="opponent-name">Unknown</span></p>
+                <button class="btn btn-primary" onclick="startBattle()">Accept</button>
+                <button class="btn btn-danger" onclick="declineMatch()">Decline</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/supabase-client.js"></script>
+<script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/holmgang.js"></script>
+</body>
+</html>
