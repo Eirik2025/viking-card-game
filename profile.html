@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
     <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/collection.css">
+    <link rel="stylesheet" href="css/profile.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -21,44 +21,54 @@
     </nav>
 
     <div class="container">
-        <div class="collection-header">
-            <h1 id="profile-name">Warrior</h1>
+        <div class="profile-header">
+            <div class="avatar-section">
+                <div class="avatar-wrapper">
+                    <img id="profile-avatar" src="" alt="Avatar" class="profile-avatar">
+                    <label for="avatar-upload" class="avatar-overlay">📷 Change</label>
+                    <input type="file" id="avatar-upload" accept="image/*" class="hidden">
+                </div>
+                <h1 id="profile-name">Warrior</h1>
+                <span id="profile-role" class="role-badge">User</span>
+            </div>
         </div>
-        <div class="modal-stats" id="profile-stats"></div>
+
+        <div class="profile-grid">
+            <!-- Stats Column -->
+            <div class="profile-card">
+                <h2>⚔️ Combat Stats</h2>
+                <div class="stat-grid" id="combat-stats"></div>
+                <div class="exp-bar-container">
+                    <div class="exp-label">Experience</div>
+                    <div class="exp-bar">
+                        <div id="exp-fill" class="exp-fill" style="width: 0%"></div>
+                        <span id="exp-text">0 / 100</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Column -->
+            <div class="profile-card">
+                <h2>👥 Social</h2>
+                <div class="info-list" id="social-info"></div>
+            </div>
+
+            <!-- Kingdom Column -->
+            <div class="profile-card">
+                <h2>🏰 Kingdom</h2>
+                <div class="info-list" id="kingdom-info"></div>
+            </div>
+
+            <!-- Collection Column -->
+            <div class="profile-card wide">
+                <h2>🃏 Collection</h2>
+                <div class="collection-summary" id="collection-summary"></div>
+            </div>
+        </div>
     </div>
 
     <script type="module" src="js/supabase-client.js"></script>
-<script type="module" src="js/auth-guard.js"></script>
     <script type="module" src="js/auth-guard.js"></script>
-    <script type="module">
-        import { supabase, getCurrentUser, signOut } from './supabase-client.js';
-        window.signOut = signOut;
-        
-        async function loadProfile() {
-            const user = await getCurrentUser();
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', user.id)
-                .single();
-            
-            document.getElementById('profile-name').textContent = profile.username;
-            const stats = {
-                Level: profile.level,
-                Experience: profile.experience,
-                Prestige: profile.prestige_level,
-                Wins: profile.total_wins,
-                Gold: profile.gold
-            };
-            
-            document.getElementById('profile-stats').innerHTML = Object.entries(stats).map(([k,v]) => `
-                <div class="stat-box">
-                    <span class="stat-label">${k}</span>
-                    <span class="stat-value">${v}</span>
-                </div>
-            `).join('');
-        }
-        loadProfile();
-    </script>
+    <script type="module" src="js/profile.js"></script>
 </body>
 </html>
