@@ -14,44 +14,74 @@
         <ul class="nav-links">
             <li><a href="index.html">Home</a></li>
             <li><a href="friends.html" class="active">Friends</a></li>
+            <li><a href="kingdoms.html">Kingdoms</a></li>
         </ul>
+        <div class="user-menu">
+            <button class="btn btn-secondary" onclick="signOut()">Logout</button>
+        </div>
     </nav>
 
     <div class="container">
         <div class="friends-layout">
+            <!-- Left Sidebar -->
             <div class="friends-sidebar">
-                <div class="search-box">
-                    <input type="text" id="find-player" placeholder="Find players...">
-                    <button onclick="searchPlayers()" class="btn btn-primary">Search</button>
+                <div class="sidebar-header">
+                    <h2>Social</h2>
                 </div>
                 
-                <div class="friends-tabs">
-                    <button class="tab-btn active" data-tab="friends">Friends</button>
-                    <button class="tab-btn" data-tab="requests">Requests</button>
-                    <button class="tab-btn" data-tab="messages">Messages</button>
+                <div class="sidebar-tabs">
+                    <button class="sidebar-tab active" data-tab="friends">
+                        <span>👥 Friends</span>
+                    </button>
+                    <button class="sidebar-tab" data-tab="requests">
+                        <span>📩 Requests</span>
+                        <span class="badge" id="request-count" style="display:none">0</span>
+                    </button>
+                    <button class="sidebar-tab" data-tab="find">
+                        <span>🔍 Find Players</span>
+                    </button>
                 </div>
 
-                <div id="tab-content" class="tab-content">
-                    <!-- Populated by JS -->
+                <div class="sidebar-content" id="sidebar-content"></div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="friends-main" id="friends-main">
+                <div class="empty-state">
+                    <div class="empty-icon">👋</div>
+                    <h3>Select a Friend</h3>
+                    <p>Choose a friend from the list to view details or start chatting.</p>
                 </div>
             </div>
 
+            <!-- Chat Panel -->
             <div id="chat-panel" class="chat-panel hidden">
                 <div class="chat-header">
-                    <h3 id="chat-with">Select a friend</h3>
-                    <button class="btn btn-secondary" onclick="challengeFriend()">⚔️ Challenge</button>
+                    <div class="chat-friend-info">
+                        <img id="chat-avatar" src="" alt="">
+                        <div>
+                            <div class="chat-friend-name" id="chat-with">Select a friend</div>
+                            <div class="chat-friend-status" id="chat-status">offline</div>
+                        </div>
+                    </div>
                 </div>
+                
+                <div class="chat-actions">
+                    <button class="btn btn-primary" onclick="challengeFriend()">⚔️ Challenge to Battle</button>
+                    <button class="btn btn-danger" onclick="removeFriend()">❌ Remove Friend</button>
+                </div>
+                
                 <div id="private-messages" class="private-messages"></div>
+                
                 <div class="chat-input-area">
-                    <input type="text" id="private-input" placeholder="Message...">
-                    <button onclick="sendPrivateMessage()" class="btn btn-primary">Send</button>
+                    <input type="text" id="private-input" placeholder="Type a message...">
+                    <button class="btn btn-primary" onclick="sendPrivateMessage()">Send</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script type="module" src="js/supabase-client.js"></script>
-<script type="module" src="js/auth-guard.js"></script>
     <script type="module" src="js/auth-guard.js"></script>
     <script type="module" src="js/friends.js"></script>
 </body>

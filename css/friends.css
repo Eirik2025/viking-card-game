@@ -1,86 +1,266 @@
 .friends-layout {
     display: grid;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 320px 1fr;
     gap: 2rem;
-    height: calc(100vh - 100px);
+    height: calc(100vh - 80px);
+    padding: 2rem;
 }
 
 .friends-sidebar {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.03);
     border-radius: 12px;
-    padding: 1.5rem;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
-.search-box {
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar-header h2 {
+    color: var(--primary);
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.sidebar-tabs {
     display: flex;
+    flex-direction: column;
     gap: 0.5rem;
-    margin-bottom: 1rem;
+    padding: 1rem;
 }
 
-.search-box input {
-    flex: 1;
-    padding: 0.5rem;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid var(--border);
+.sidebar-tab {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.2s;
+    border-radius: 8px;
+}
+
+.sidebar-tab:hover {
+    background: rgba(255,255,255,0.05);
     color: var(--text);
-    border-radius: 4px;
 }
 
-.friends-tabs {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+.sidebar-tab.active {
+    background: rgba(201, 162, 39, 0.2);
+    color: var(--primary);
+    border-color: var(--primary);
 }
 
-.tab-content {
+.sidebar-tab .badge {
+    background: var(--accent);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    min-width: 20px;
+    text-align: center;
+}
+
+.sidebar-content {
     flex: 1;
     overflow-y: auto;
+    padding: 0 1rem 1rem;
 }
 
-.friend-item, .request-item, .message-preview {
-    padding: 1rem;
-    background: rgba(0,0,0,0.2);
-    border-radius: 8px;
-    margin-bottom: 0.5rem;
-    cursor: pointer;
+.friend-list, .request-list {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.friend-item, .request-item, .player-result-item {
+    display: flex;
     align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    cursor: pointer;
     transition: all 0.2s;
 }
 
-.friend-item:hover, .message-preview:hover {
+.friend-item:hover, .player-result-item:hover {
     background: rgba(201, 162, 39, 0.1);
+    transform: translateX(5px);
+}
+
+.friend-item.active {
+    background: rgba(201, 162, 39, 0.2);
+    border: 1px solid var(--primary);
+}
+
+.friend-avatar, .request-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    object-fit: cover;
+}
+
+.friend-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.friend-name, .request-name {
+    font-weight: bold;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.friend-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted);
 }
 
 .friend-status {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     display: inline-block;
     margin-right: 0.5rem;
 }
 
-.status-online { background: var(--success); }
+.status-online { background: var(--success); box-shadow: 0 0 6px var(--success); }
 .status-offline { background: var(--text-muted); }
-.status-ingame { background: var(--warning); }
+.status-ingame { background: var(--warning); box-shadow: 0 0 6px var(--warning); }
 
-.chat-panel {
-    background: rgba(255,255,255,0.05);
-    border-radius: 12px;
-    padding: 1.5rem;
+.request-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
+
+.find-players {
+    padding: 1rem;
+}
+
+.search-box {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.search-box input {
+    flex: 1;
+    padding: 0.75rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    font-family: inherit;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.player-results {
     display: flex;
     flex-direction: column;
+    gap: 0.5rem;
+}
+
+.friends-main {
+    background: rgba(255,255,255,0.02);
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 400px;
+    position: relative;
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    margin: auto;
+}
+
+.empty-state .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+.chat-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+}
+
+.chat-panel.hidden {
+    display: none;
 }
 
 .chat-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 1rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--border);
+    margin-bottom: 1rem;
+}
+
+.chat-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid var(--primary);
+    object-fit: cover;
+}
+
+.chat-friend-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.chat-friend-status {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-transform: capitalize;
+}
+
+.chat-actions {
+    display: flex;
+    gap: 1rem;
     margin-bottom: 1rem;
 }
 
@@ -90,13 +270,20 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    padding-right: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .message-bubble {
-    max-width: 70%;
-    padding: 0.75rem;
+    max-width: 75%;
+    padding: 0.75rem 1rem;
     border-radius: 12px;
-    margin: 0.25rem 0;
+    animation: messagePop 0.3s ease;
+}
+
+@keyframes messagePop {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
 }
 
 .message-sent {
@@ -115,7 +302,6 @@
 .chat-input-area {
     display: flex;
     gap: 0.5rem;
-    margin-top: 1rem;
     padding-top: 1rem;
     border-top: 1px solid var(--border);
 }
@@ -126,15 +312,32 @@
     background: rgba(255,255,255,0.1);
     border: 1px solid var(--border);
     color: var(--text);
-    border-radius: 4px;
+    border-radius: 8px;
+    font-family: inherit;
 }
 
-.request-actions {
-    display: flex;
-    gap: 0.5rem;
+.chat-input-area input:focus {
+    outline: none;
+    border-color: var(--primary);
 }
 
 @media (max-width: 768px) {
-    .friends-layout { grid-template-columns: 1fr; }
-    .chat-panel.hidden-mobile { display: none; }
+    .friends-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .friends-sidebar {
+        display: none;
+    }
+    
+    .friends-sidebar.mobile-active {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 100;
+        background: var(--dark);
+    }
 }

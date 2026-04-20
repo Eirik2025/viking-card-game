@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battle Lobby</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/battle-lobby.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">⚔️ Battle Lobby</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="battle-lobby.html" class="active">Battle</a></li>
+        </ul>
+        <div class="user-menu">
+            <button class="btn btn-secondary" onclick="signOut()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="lobby-header">
+            <h1>Choose Your Battle</h1>
+            <p>Host a private match or join with a code</p>
+        </div>
+
+        <div class="lobby-grid">
+            <!-- Host Battle -->
+            <div class="lobby-card host-card">
+                <div class="card-icon">🏰</div>
+                <h2>Host Battle</h2>
+                <p>Create a private room and invite warriors with a battle code</p>
+                
+                <div class="host-options">
+                    <label>Battle Type</label>
+                    <select id="battle-type">
+                        <option value="standard">Standard (20 HP)</option>
+                        <option value="quick">Quick (10 HP)</option>
+                        <option value="epic">Epic (30 HP)</option>
+                    </select>
+                    
+                    <button class="btn btn-primary btn-large" onclick="hostBattle()">
+                        Create Battle Room
+                    </button>
+                </div>
+                
+                <div id="host-code-display" class="code-display hidden">
+                    <div class="code-label">Your Battle Code</div>
+                    <div class="code-value" id="battle-code">----</div>
+                    <button class="btn btn-secondary" onclick="copyCode()">📋 Copy</button>
+                    <p class="waiting-text">Waiting for opponent...</p>
+                    <button class="btn btn-danger" onclick="cancelHost()">Cancel</button>
+                </div>
+            </div>
+
+            <!-- Join Battle -->
+            <div class="lobby-card join-card">
+                <div class="card-icon">⚔️</div>
+                <h2>Join Battle</h2>
+                <p>Enter a battle code to join a warrior's room</p>
+                
+                <div class="join-form">
+                    <label>Enter Battle Code</label>
+                    <input type="text" id="join-code" placeholder="XXXX" maxlength="6" style="text-transform:uppercase;">
+                    <button class="btn btn-primary btn-large" onclick="joinBattle()">
+                        Enter Battle
+                    </button>
+                </div>
+                
+                <div class="quick-join">
+                    <p>Or <a href="#" onclick="findRandomOpponent()">find a random opponent</a></p>
+                </div>
+            </div>
+
+            <!-- Active Battles -->
+            <div class="lobby-card history-card">
+                <div class="card-icon">📜</div>
+                <h2>Recent Battles</h2>
+                <div id="recent-battles" class="recent-list">
+                    <p class="empty">No recent battles</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Join In Progress Modal -->
+    <div id="join-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Joining Battle...</h3>
+            <p>Connecting to battle room <span id="join-code-display"></span></p>
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <script type="module" src="js/supabase-client.js"></script>
+    <script type="module" src="js/auth-guard.js"></script>
+    <script type="module" src="js/battle-lobby.js"></script>
+</body>
+</html>
