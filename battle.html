@@ -17,10 +17,8 @@
                     <img id="player-avatar" src="" alt="You">
                     <div class="player-details">
                         <h2 id="player-name">You</h2>
-                        <div class="stat-badges" id="player-badges"></div>
                     </div>
                 </div>
-                <div class="player-resources" id="player-resources"></div>
             </div>
             
             <div class="battle-info">
@@ -34,16 +32,95 @@
                     <img id="opponent-avatar" src="" alt="Opponent">
                     <div class="player-details">
                         <h2 id="opponent-name">Opponent</h2>
-                        <div class="stat-badges" id="opponent-badges"></div>
                     </div>
                 </div>
-                <div class="player-resources opponent" id="opponent-resources"></div>
             </div>
         </div>
 
-        <!-- Battle Zone -->
+        <!-- Battle Zone - Single Box Design -->
         <div class="battle-zone" id="battle-zone">
-            <!-- Dynamic Content Based on Config -->
+            <div class="zone-content">
+                <!-- Player Box (Active Controls) -->
+                <div class="stat-box" id="player-stat-box">
+                    <div class="stat-box-header">
+                        <span id="player-stat-label">HP</span>
+                        <span class="player-tag">YOU</span>
+                    </div>
+                    <div class="stat-value-display">
+                        <span id="player-stat-value">20</span>
+                        <span class="stat-max" id="player-stat-max">/ 20</span>
+                    </div>
+                    <div class="stat-controls" id="player-controls">
+                        <div class="quick-buttons">
+                            <button class="btn-stat" onclick="modifyStat(-10)">-10</button>
+                            <button class="btn-stat" onclick="modifyStat(-5)">-5</button>
+                            <button class="btn-stat" onclick="modifyStat(-1)">-1</button>
+                            <button class="btn-stat" onclick="modifyStat(1)">+1</button>
+                            <button class="btn-stat" onclick="modifyStat(5)">+5</button>
+                            <button class="btn-stat" onclick="modifyStat(10)">+10</button>
+                        </div>
+                        <div class="custom-control">
+                            <input type="number" id="custom-amount" value="1" min="1">
+                            <button class="btn btn-danger" onclick="modifyStat(-getCustomAmount())">−</button>
+                            <button class="btn btn-success" onclick="modifyStat(getCustomAmount())">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VS Divider -->
+                <div class="vs-divider">
+                    <span>VS</span>
+                </div>
+
+                <!-- Opponent Box (Read Only) -->
+                <div class="stat-box opponent" id="opponent-stat-box">
+                    <div class="stat-box-header">
+                        <span id="opponent-stat-label">HP</span>
+                        <span class="player-tag">OPPONENT</span>
+                    </div>
+                    <div class="stat-value-display">
+                        <span id="opponent-stat-value">20</span>
+                        <span class="stat-max" id="opponent-stat-max">/ 20</span>
+                    </div>
+                    <div class="stat-controls read-only">
+                        <div class="quick-buttons">
+                            <button class="btn-stat" disabled>-10</button>
+                            <button class="btn-stat" disabled>-5</button>
+                            <button class="btn-stat" disabled>-1</button>
+                            <button class="btn-stat" disabled>+1</button>
+                            <button class="btn-stat" disabled>+5</button>
+                            <button class="btn-stat" disabled>+10</button>
+                        </div>
+                        <div class="custom-control">
+                            <input type="number" disabled value="1">
+                            <button class="btn" disabled>−</button>
+                            <button class="btn" disabled>+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tools Panel -->
+        <div class="tools-panel" id="tools-panel">
+            <div class="tool-group" id="dice-tool">
+                <h4>🎲 Dice Roller</h4>
+                <div class="dice-buttons">
+                    <button class="btn-tool" onclick="rollDice(4)">d4</button>
+                    <button class="btn-tool" onclick="rollDice(6)">d6</button>
+                    <button class="btn-tool" onclick="rollDice(8)">d8</button>
+                    <button class="btn-tool" onclick="rollDice(10)">d10</button>
+                    <button class="btn-tool" onclick="rollDice(12)">d12</button>
+                    <button class="btn-tool" onclick="rollDice(20)">d20</button>
+                </div>
+                <div class="dice-result" id="dice-result">-</div>
+            </div>
+
+            <div class="tool-group" id="coin-tool">
+                <h4>🪙 Coin Flip</h4>
+                <button class="btn btn-tool btn-large" onclick="flipCoin()">Flip Coin</button>
+                <div class="coin-result" id="coin-result">-</div>
+            </div>
         </div>
 
         <!-- Battle Log -->
@@ -60,9 +137,9 @@
     <div id="win-modal" class="modal hidden">
         <div class="modal-content win-content">
             <h1 id="win-title">Victory!</h1>
-            <p id="Win-message"></p>
-            <div class="Win-stats" id="Win-stats"></div>
-            <button class="btn btn-primary btn-large" onclick="ReturnToLobby()">Return to Lobby</button>
+            <p id="win-message"></p>
+            <div class="win-stats" id="win-stats"></div>
+            <button class="btn btn-primary btn-large" onclick="returnToLobby()">Return to Lobby</button>
         </div>
     </div>
 
