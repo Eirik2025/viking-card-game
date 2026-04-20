@@ -14,18 +14,23 @@ async function loadFriends() {
     const user = await getCurrentUser();
     const { data: friendships } = await supabase
         .from('friendships')
-        .select('*, friend:profiles!friend_id(username, status)')
+        .select('*, friend:profiles!friend_id(username, status, avatar_url)')
         .eq('user_id', user.id)
         .eq('status', 'accepted');
     
     const container = document.getElementById('tab-content');
     container.innerHTML = (friendships || []).map(f => `
         <div class="friend-item" onclick="openChat('${f.friend_id}', '${f.friend.username}')">
-            <div>
-                <span class="friend-status status-${f.friend.status}"></span>
-                <span>${f.friend.username}</span>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+                <img src="${f.friend.avatar_url || 'https://placehold.co/32x32/1a1a2e/c9a227?text=' + (f.friend.username?.[0] || '?')}" 
+                     style="width:32px;height:32px;border-radius:50%;border:1px solid var(--primary);">
+                <div>
+                    <div style="font-weight:bold;">${f.friend.username}</div>
+                    <div style="font-size:0.8rem;color:var(--text-muted);">
+                        <span class="friend-status status-${f.friend.status}"></span>${f.friend.status}
+                    </div>
+                </div>
             </div>
-            <span class="status-text">${f.friend.status}</span>
         </div>
     `).join('');
 }
@@ -34,14 +39,18 @@ async function loadRequests() {
     const user = await getCurrentUser();
     const { data: requests } = await supabase
         .from('friendships')
-        .select('*, requester:profiles!user_id(username)')
+        .select('*, requester:profiles!user_id(username, avatar_url)')
         .eq('friend_id', user.id)
         .eq('status', 'pending');
     
     const container = document.getElementById('tab-content');
     container.innerHTML = (requests || []).map(r => `
         <div class="request-item">
-            <span>${r.requester.username}</span>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+                <img src="${r.requester.avatar_url || 'https://placehold.co/32x32/1a1a2e/c9a227?text=' + (r.requester.username?.[0] || '?')}" 
+                     style="width:32px;height:32px;border-radius:50%;border:1px solid var(--primary);">
+                <span>${r.requester.username}</span>
+            </div>
             <div class="request-actions">
                 <button class="btn btn-primary" onclick="handleRequest('${r.id}', 'accepted')">Accept</button>
                 <button class="btn btn-danger" onclick="handleRequest('${r.id}', 'declined')">Decline</button>
@@ -56,7 +65,7 @@ async function searchPlayers() {
     
     const { data: players } = await supabase
         .from('profiles')
-        .select('id, username')
+        .select('id, username, avatar_url')
         .ilike('username', `%${query}%`)
         .neq('id', user.id)
         .limit(10);
@@ -64,7 +73,11 @@ async function searchPlayers() {
     const container = document.getElementById('tab-content');
     container.innerHTML = (players || []).map(p => `
         <div class="friend-item">
-            <span>${p.username}</span>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+                <img src="${p.avatar_url || 'https://placehold.co/32x32/1a1a2e/c9a227?text=' + (p.username?.[0] || '?')}" 
+                     style="width:32px;height:32px;border-radius:50%;border:1px solid var(--primary);">
+                <span>${p.username}</span>
+            </div>
             <button class="btn btn-secondary" onclick="sendRequest('${p.id}')">Add Friend</button>
         </div>
     `).join('');
@@ -72,17 +85,56 @@ async function searchPlayers() {
 
 async function sendRequest(friendId) {
     const user = await getCurrentUser();
-    await supabase.from('friendships').insert({
+    
+    // Check for existing friendship in EITHER direction
+    const { data: existing } = await supabase
+        .from('friendships')
+        .select('*')
+        .or(`and(user_id.eq.${user.id},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${user.id})`);
+    
+    if (existing && existing.length > 0) {
+        const row = existing[0];
+        
+        if (row.status === 'accepted') {
+            alert('You are already friends with this player!');
+            return;
+        }
+        
+        // We sent them a request already
+        if (row.user_id === user.id) {
+            alert('Friend request already sent!');
+            return;
+        }
+        
+        // They sent us a request — auto-accept
+        if (row.friend_id === user.id) {
+            await supabase.from('friendships')
+                .update({ status: 'accepted' })
+                .eq('id', row.id);
+            alert('Friend request accepted!');
+            loadFriends();
+            return;
+        }
+    }
+    
+    // Safe to insert
+    const { error } = await supabase.from('friendships').insert({
         user_id: user.id,
         friend_id: friendId,
         status: 'pending'
     });
-    alert('Friend request sent!');
+    
+    if (error) {
+        alert('Error: ' + error.message);
+    } else {
+        alert('Friend request sent!');
+    }
 }
 
 async function handleRequest(id, status) {
     await supabase.from('friendships').update({ status }).eq('id', id);
     loadRequests();
+    if (status === 'accepted') loadFriends();
 }
 
 async function openChat(friendId, username) {
@@ -113,6 +165,7 @@ async function openChat(friendId, username) {
                 div.className = 'message-bubble message-received';
                 div.textContent = payload.new.content;
                 container.appendChild(div);
+                container.scrollTop = container.scrollHeight;
             }
         )
         .subscribe();
