@@ -2,95 +2,262 @@ import { supabase, getCurrentUser, signOut } from './supabase-client.js';
 
 window.signOut = signOut;
 window.selectStyle = selectStyle;
-window.backToStyles = backToStyles;
-window.hostConfiguredBattle = hostConfiguredBattle;
-window.copyCode = copyCode;
-window.cancelBattle = cancelBattle;
-window.joinBattle = joinBattle;
+// Match HTML onclick casing exactly:
+window.BackToStyles = backToStyles;
+window.HostConfiguredBattle = hostConfiguredBattle;
+window.CopyCode = copyCode;
+window.CancelBattle = cancelBattle;
+window.JoinBattle = joinBattle;
 
-let selectedStyle = null;
-let currentBattleId = null;
-let battleChannel = null;
-
-const stylePresets = {
-    viking: {
-        useHealth: true,
-        useLife: false,
-        useTrophies: false,
-        startValue: 20,
-        incrementStep: 1,
-        useDice: true,
-        useCoin: true,
-        useTimer: false,
-        winCondition: 'zero'
-    },
-    mtg: {
-        useHealth: false,
-        useLife: true,
-        useTrophies: false,
-        startValue: 20,
-        incrementStep: 1,
-        useDice: true,
-        useCoin: false,
-        useTimer: true,
-        winCondition: 'zero'
-    },
-    pokemon: {
-        useHealth: false,
-        useLife: false,
-        useTrophies: true,
-        startValue: 6,
-        incrementStep: 1,
-        useDice: false,
-        useCoin: true,
-        useTimer: false,
-        winCondition: 'trophies'
-    },
-    custom: {
-        useHealth: true,
-        useLife: false,
-        useTrophies: false,
-        startValue: 20,
-        incrementStep: 1,
-        useDice: true,
-        useCoin: true,
-        useTimer: false,
-        winCondition: 'zero'
-    }
+let selectedConfig = {
+    style: 'klandestine',
+    useHp: true,
+    useCoins: true,
+    useDice: true,
+    hpCount: 14,
+    hpValue: 1,
+    vigorColors: [],
+    manaColors: [],
+    typeColors: [],
+    useLife: false,
+    startLife: 8000,
+    lifeIncrement: 1000,
+    useTrophies: false,
+    trophyCount: 6
 };
 
+// Color Presets
+const vigorColors = [
+    '#e74c3c', '#f39c12', '#f1c40f', '#27ae60', '#2980b9', 
+    '#8e44ad', '#2c3e50', '#ecf0f1', '#95a5a6',
+    '#d35400', '#c0392b', '#16a085', '#2ecc71', '#3498db'
+];
+
+const manaColors = ['#e74c3c', '#f39c12', '#f1c40f', '#27ae60', '#2980b9'];
+
+// Generate 18 Type Colors
+const typeColors = [];
+for (let i = 0; i < 18; i++) {
+    typeColors.push(`hsl(${i * 20}, 70%, 50%)`);
+}
+
 function selectStyle(style) {
-    selectedStyle = style;
+    selectedConfig.style = style;
     
-    // Visual selection
+    // Update UI Selection
     document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
     event.currentTarget.classList.add('selected');
     
-    // Apply preset
-    const preset = stylePresets[style];
-    document.getElementById('use-health').checked = preset.useHealth;
-    document.getElementById('use-life').checked = preset.useLife;
-    document.getElementById('use-trophies').checked = preset.useTrophies;
-    document.getElementById('start-value').value = preset.startValue;
-    document.getElementById('increment-step').value = preset.incrementStep;
-    document.getElementById('use-dice').checked = preset.useDice;
-    document.getElementById('use-coin').checked = preset.useCoin;
-    document.getElementById('use-timer').checked = preset.useTimer;
-    document.querySelector(`input[name="win-cond"][value="${preset.winCondition}"]`).checked = true;
+    // Reset Config
+    resetConfig();
     
-    // Show config
+    // Show Config Panel
     document.getElementById('config-panel').classList.remove('hidden');
     document.getElementById('join-section').classList.add('hidden');
     
-    // Scroll to config
-    document.getElementById('config-panel').scrollIntoView({ behavior: 'smooth' });
+    // Setup Config Based on Style
+    setupConfigForStyle(style);
+}
+
+function resetConfig() {
+    selectedConfig = {
+        style: null,
+        useHp: false,
+        useCoins: false,
+        useDice: false,
+        hpCount: 20,
+        hpValue: 20,
+        vigorColors: [],
+        manaColors: [],
+        typeColors: [],
+        useLife: false,
+        startLife: 8000,
+        lifeIncrement: 1000,
+        useTrophies: false,
+        trophyCount: 6
+    };
+}
+
+function setupConfigForStyle(style) {
+    // Hide all sections first - MATCHING HTML IDs EXACTLY:
+    // HTML has: vigor-Section, Mana-Section, Type-Section
+    // Note: There's no "life-section" in the HTML! Life settings are in a generic config-section
+    
+    const vigorSection = document.getElementById('vigor-Section');
+    const manaSection = document.getElementById('Mana-Section');
+    const typeSection = document.getElementById('Type-Section');
+    
+    if (vigorSection) vigorSection.classList.add('hidden');
+    if (manaSection) manaSection.classList.add('hidden');
+    if (typeSection) typeSection.classList.add('hidden');
+    
+    // Setup based on style
+    switch(style) {
+        case 'klandestine':
+            selectedConfig.useHp = true;
+            selectedConfig.useCoins = true;
+            selectedConfig.useDice = true;
+            selectedConfig.hpCount = 14;
+            selectedConfig.hpValue = 1;
+            selectedConfig.vigorColors = [];
+            document.getElementById('use-hp').checked = true;
+            document.getElementById('use-coins').checked = true;
+            document.getElementById('use-dice').checked = true;
+            if (vigorSection) vigorSection.classList.remove('hidden');
+            break;
+            
+        case 'healthbox':
+            selectedConfig.useHp = true;
+            selectedConfig.useCoins = false;
+            selectedConfig.useDice = true;
+            selectedConfig.hpCount = 5;
+            selectedConfig.hpValue = 20;
+            selectedConfig.manaColors = [];
+            document.getElementById('use-hp').checked = true;
+            document.getElementById('use-coins').checked = false;
+            document.getElementById('use-dice').checked = true;
+            if (manaSection) manaSection.classList.remove('hidden');
+            break;
+            
+        case 'award':
+            selectedConfig.useHp = false;
+            selectedConfig.useCoins = true;
+            selectedConfig.useDice = false;
+            selectedConfig.useTrophies = true;
+            selectedConfig.trophyCount = 6;
+            selectedConfig.typeColors = [];
+            document.getElementById('use-hp').checked = false;
+            document.getElementById('use-coins').checked = true;
+            document.getElementById('use-dice').checked = false;
+            if (typeSection) typeSection.classList.remove('hidden');
+            break;
+            
+        case 'lifepoints':
+            selectedConfig.useLife = true;
+            selectedConfig.startLife = 8000;
+            selectedConfig.lifeIncrement = 1000;
+            document.getElementById('use-hp').checked = false;
+            break;
+            
+        case 'custom':
+            selectedConfig.useHp = true;
+            selectedConfig.useCoins = true;
+            selectedConfig.useDice = true;
+            selectedConfig.useTrophies = true;
+            selectedConfig.hpCount = 20;
+            selectedConfig.hpValue = 20;
+            selectedConfig.startLife = 8000;
+            selectedConfig.lifeIncrement = 1000;
+            selectedConfig.trophyCount = 6;
+            document.getElementById('use-hp').checked = true;
+            document.getElementById('use-coins').checked = true;
+            document.getElementById('use-dice').checked = true;
+            if (vigorSection) vigorSection.classList.remove('hidden');
+            if (manaSection) manaSection.classList.remove('hidden');
+            if (typeSection) typeSection.classList.remove('hidden');
+            break;
+    }
+    
+    // Update UI Values - MATCHING HTML IDs EXACTLY
+    document.getElementById('hp-count').value = selectedConfig.hpCount;
+    const hpValueEl = document.getElementById('HP-Value');
+    if (hpValueEl) hpValueEl.value = selectedConfig.hpValue;
+    
+    document.getElementById('start-life').value = selectedConfig.startLife;
+    const lifeIncEl = document.getElementById('Life-Increment');
+    if (lifeIncEl) lifeIncEl.value = selectedConfig.lifeIncrement;
+    
+    renderColorGrids();
+}
+
+function renderColorGrids() {
+    // Vigor Colors (14) - HTML has id="Vigor-colors"
+    const vigorContainer = document.getElementById('Vigor-colors');
+    if (vigorContainer) {
+        vigorContainer.innerHTML = '';
+        vigorColors.forEach((color, index) => {
+            const div = document.createElement('div');
+            div.className = 'color-option';
+            div.style.backgroundColor = color;
+            div.dataset.index = index;
+            if (selectedConfig.vigorColors.includes(index)) {
+                div.classList.add('selected');
+            }
+            div.addEventListener('click', () => toggleVigorColor(index));
+            vigorContainer.appendChild(div);
+        });
+    }
+    
+    // Mana Colors (5) - HTML has id="Mana-colors"
+    const manaContainer = document.getElementById('Mana-colors');
+    if (manaContainer) {
+        manaContainer.innerHTML = '';
+        manaColors.forEach((color, index) => {
+            const div = document.createElement('div');
+            div.className = 'color-option';
+            div.style.backgroundColor = color;
+            div.dataset.index = index;
+            if (selectedConfig.manaColors.includes(index)) {
+                div.classList.add('selected');
+            }
+            div.addEventListener('click', () => toggleManaColor(index));
+            manaContainer.appendChild(div);
+        });
+    }
+    
+    // Type Colors (18) - HTML has id="Type-colors"
+    const typeContainer = document.getElementById('Type-colors');
+    if (typeContainer) {
+        typeContainer.innerHTML = '';
+        typeColors.forEach((color, index) => {
+            const div = document.createElement('div');
+            div.className = 'color-option';
+            div.style.backgroundColor = color;
+            div.dataset.index = index;
+            if (selectedConfig.typeColors.includes(index)) {
+                div.classList.add('selected');
+            }
+            div.addEventListener('click', () => toggleTypeColor(index));
+            typeContainer.appendChild(div);
+        });
+    }
+}
+
+function toggleVigorColor(index) {
+    const idx = selectedConfig.vigorColors.indexOf(index);
+    if (idx > -1) {
+        selectedConfig.vigorColors.splice(idx, 1);
+    } else {
+        selectedConfig.vigorColors.push(index);
+    }
+    renderColorGrids();
+}
+
+function toggleManaColor(index) {
+    const idx = selectedConfig.manaColors.indexOf(index);
+    if (idx > -1) {
+        selectedConfig.manaColors.splice(idx, 1);
+    } else {
+        selectedConfig.manaColors.push(index);
+    }
+    renderColorGrids();
+}
+
+function toggleTypeColor(index) {
+    const idx = selectedConfig.typeColors.indexOf(index);
+    if (idx > -1) {
+        selectedConfig.typeColors.splice(idx, 1);
+    } else {
+        selectedConfig.typeColors.push(index);
+    }
+    renderColorGrids();
 }
 
 function backToStyles() {
     document.getElementById('config-panel').classList.add('hidden');
     document.getElementById('join-section').classList.remove('hidden');
     document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
-    selectedStyle = null;
+    selectedConfig.style = null;
 }
 
 function generateBattleCode() {
@@ -104,20 +271,6 @@ async function hostConfiguredBattle() {
         return;
     }
     
-    // Gather configuration
-    const config = {
-        style: selectedStyle,
-        useHealth: document.getElementById('use-health').checked,
-        useLife: document.getElementById('use-life').checked,
-        useTrophies: document.getElementById('use-trophies').checked,
-        startValue: parseInt(document.getElementById('start-value').value),
-        incrementStep: parseInt(document.getElementById('increment-step').value),
-        useDice: document.getElementById('use-dice').checked,
-        useCoin: document.getElementById('use-coin').checked,
-        useTimer: document.getElementById('use-timer').checked,
-        winCondition: document.querySelector('input[name="win-cond"]:checked').value
-    };
-    
     const code = generateBattleCode();
     
     const { data, error } = await supabase
@@ -125,15 +278,15 @@ async function hostConfiguredBattle() {
         .insert({
             host_id: user.id,
             battle_code: code,
-            config: config,
+            config: selectedConfig,
             status: 'waiting',
             player1_id: user.id,
-            player1_health: config.useHealth ? config.startValue : null,
-            player1_life: config.useLife ? config.startValue : null,
-            player1_trophies: config.useTrophies ? 0 : null,
-            player2_health: config.useHealth ? config.startValue : null,
-            player2_life: config.useLife ? config.startValue : null,
-            player2_trophies: config.useTrophies ? 0 : null
+            player1_health: selectedConfig.useHp ? selectedConfig.hpValue * selectedConfig.hpCount : null,
+            player1_life: selectedConfig.useLife ? selectedConfig.startLife : null,
+            player1_trophies: selectedConfig.useTrophies ? 0 : null,
+            player2_health: selectedConfig.useHp ? selectedConfig.hpValue * selectedConfig.hpCount : null,
+            player2_life: selectedConfig.useLife ? selectedConfig.startLife : null,
+            player2_trophies: selectedConfig.useTrophies ? 0 : null
         })
         .select()
         .single();
@@ -144,15 +297,11 @@ async function hostConfiguredBattle() {
         return;
     }
     
-    currentBattleId = data.id;
-    
-    // Show code display
     document.getElementById('config-panel').classList.add('hidden');
     document.getElementById('code-display').classList.remove('hidden');
     document.getElementById('battle-code').textContent = code;
     
-    // Listen for opponent
-    battleChannel = supabase
+    supabase
         .channel(`battle:${code}`)
         .on('postgres_changes',
             { event: 'UPDATE', schema: 'public', table: 'battles', filter: `id=eq.${data.id}` },
@@ -168,22 +317,24 @@ async function hostConfiguredBattle() {
 function copyCode() {
     const code = document.getElementById('battle-code').textContent;
     navigator.clipboard.writeText(code).then(() => {
-        alert('Code copied!');
+        alert('Code copied to clipboard!');
     });
 }
 
 async function cancelBattle() {
-    if (!currentBattleId) return;
+    const code = document.getElementById('battle-code').textContent;
     
-    await supabase.from('battles').delete().eq('id', currentBattleId);
+    const { error } = await supabase
+        .from('battles')
+        .update({ status: 'cancelled' })
+        .eq('battle_code', code);
     
-    if (battleChannel) {
-        supabase.removeChannel(battleChannel);
+    if (error) {
+        console.error('Cancel error:', error);
     }
     
     document.getElementById('code-display').classList.add('hidden');
     document.getElementById('join-section').classList.remove('hidden');
-    currentBattleId = null;
 }
 
 async function joinBattle() {
@@ -216,7 +367,6 @@ async function joinBattle() {
         return;
     }
     
-    // Join as guest
     await supabase
         .from('battles')
         .update({

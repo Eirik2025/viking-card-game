@@ -1,432 +1,594 @@
 import { supabase, getCurrentUser, signOut } from './supabase-client.js';
 
-// Expose functions to window
+// Expose to window
 window.signOut = signOut;
-window.adjustPlayerStat = adjustPlayerStat;
-window.adjustOpponentStat = adjustOpponentStat;
-window.awardTrophy = awardTrophy;
-window.rollDice = rollDice;
-window.flipCoin = flipCoin;
-window.startTimer = startTimer;
 window.endTurn = endTurn;
 window.toggleLog = toggleLog;
 window.returnToLobby = returnToLobby;
+window.modifyHp = modifyHp;
+window.modifyLife = modifyLife;
+window.modifyTrophies = modifyTrophies;
+window.rollDice = rollDice;
+window.flipCoin = flipCoin;
 
-// Battle state
+// Battle State
 let battleId = null;
-let battleCode = null;
+let battleConfig = {};
 let isHost = false;
-let config = {};
-let playerId = null;
-let opponentId = null;
-let currentTurn = null;
+let myPlayerNum = 1; // 1 or 2
+let currentTurn = 1;
 
-// Player stats
-let playerStats = {};
+// Player Data
+let myStats = {};
 let opponentStats = {};
+let battleLog = [];
 
-// Timer
-let timerInterval = null;
-let timeRemaining = 60;
+// Subscription
+let battleSub = null;
 
 async function initBattle() {
     const params = new URLSearchParams(window.location.search);
     battleId = params.get('battle');
-    battleCode = params.get('code');
+    const code = params.get('code');
     isHost = params.has('host');
-    
+
     if (!battleId) {
         alert('No battle specified');
         window.location.href = 'battle-lobby.html';
         return;
     }
-    
-    // Load battle data
+
+    // Load Battle Data
     const { data: battle, error } = await supabase
         .from('battles')
         .select('*, host:host_id(*), guest:guest_id(*)')
         .eq('id', battleId)
         .single();
-    
+
     if (error || !battle) {
         alert('Battle not found');
         window.location.href = 'battle-lobby.html';
         return;
     }
-    
-    // Set config
-    config = battle.config || {};
-    document.getElementById('display-code').textContent = battleCode;
-    
-    // Determine player/opponent
+
+    battleConfig = battle.config || {};
+    document.getElementById('display-code').textContent = code || '----';
+
+    // Determine Player Number
     const user = await getCurrentUser();
-    playerId = user.id;
-    
     if (isHost) {
-        opponentId = battle.guest_id;
+        myPlayerNum = 1;
         document.getElementById('player-name').textContent = battle.host?.username || 'You';
         document.getElementById('opponent-name').textContent = battle.guest?.username || 'Opponent';
     } else {
-        opponentId = battle.host_id;
-        document.getElementById('player-name').textContent = battle.guest?.username || 'You';
+        myPlayerNum = 2;
+        document.getElementById('player-name').textContent = 'You';
         document.getElementById('opponent-name').textContent = battle.host?.username || 'Opponent';
     }
-    
-    // Initialize stats based on config
+
+    // Initialize Stats
     initializeStats(battle);
-    
-    // Setup UI based on config
-    setupUI();
-    
-    // Subscribe to battle updates
+
+    // Setup UI
+    setupBattleUI();
+
+    // Subscribe to Changes
     subscribeToBattle();
-    
-    // Add initial log entry
-    addLogEntry('system', `Battle started! ${config.style?.toUpperCase() || 'STANDARD'} mode.`);
+
+    // Add Initial Log
+    addLogEntry('system', 'Battle Started!');
 }
 
 function initializeStats(battle) {
-    // Player stats
-    if (config.useHealth) {
-        playerStats.health = isHost ? battle.player1_health : battle.player2_health;
+    // Set Initial Values from Battle Record
+    if (myPlayerNum === 1) {
+        myStats = {
+            hp: battle.player1_health || getStartingValue(),
+            life: battle.player1_life || (battleConfig.startLife || 8000),
+            trophies: battle.player1_trophies || 0
+        };
+        opponentStats = {
+            hp: battle.player2_health || getStartingValue(),
+            life: battle.player2_life || (battleConfig.startLife || 8000),
+            trophies: battle.player2_trophies || 0
+        };
+    } else {
+        myStats = {
+            hp: battle.player2_health || getStartingValue(),
+            life: battle.player2_life || (battleConfig.startLife || 8000),
+            trophies: battle.player2_trophies || 0
+        };
+        opponentStats = {
+            hp: battle.player1_health || getStartingValue(),
+            life: battle.player1_life || (battleConfig.startLife || 8000),
+            trophies: battle.player1_trophies || 0
+        };
     }
-    if (config.useLife) {
-        playerStats.life = isHost ? battle.player1_life : battle.player2_life;
-    }
-    if (config.useTrophies) {
-        playerStats.trophies = isHost ? (battle.player1_trophies || 0) : (battle.player2_trophies || 0);
-    }
-    
-    // Opponent stats
-    if (config.useHealth) {
-        opponentStats.health = isHost ? battle.player2_health : battle.player1_health;
-    }
-    if (config.useLife) {
-        opponentStats.life = isHost ? battle.player2_life : battle.player1_life;
-    }
-    if (config.useTrophies) {
-        opponentStats.trophies = isHost ? (battle.player2_trophies || 0) : (battle.player1_trophies || 0);
-    }
-    
-    updateStatsDisplay();
+
+    currentTurn = battle.current_turn || 1;
+    updateUI();
 }
 
-function setupUI() {
-    // Show/hide controls based on config
-    if (config.useHealth || config.useLife) {
-        document.getElementById('health-controls').classList.remove('hidden');
-    } else {
-        document.getElementById('health-controls').classList.add('hidden');
+function getStartingValue() {
+    if (battleConfig.useHp) {
+        return (battleConfig.hpValue || 20) * (battleConfig.hpCount || 20);
     }
-    
-    if (config.useTrophies) {
-        document.getElementById('trophy-controls').classList.remove('hidden');
-    } else {
-        document.getElementById('trophy-controls').classList.add('hidden');
-    }
-    
-    if (config.useDice) {
-        document.getElementById('dice-tool').classList.remove('hidden');
-    } else {
-        document.getElementById('dice-tool').classList.add('hidden');
-    }
-    
-    if (config.useCoin) {
-        document.getElementById('coin-tool').classList.remove('hidden');
-    } else {
-        document.getElementById('coin-tool').classList.add('hidden');
-    }
-    
-    if (config.useTimer) {
-        document.getElementById('timer-tool').classList.remove('hidden');
-    } else {
-        document.getElementById('timer-tool').classList.add('hidden');
-    }
+    return battleConfig.startLife || 8000;
 }
 
-function updateStatsDisplay() {
-    const playerContainer = document.getElementById('player-stats');
-    const opponentContainer = document.getElementById('opponent-stats');
-    
-    // Build player stats HTML
-    let playerHTML = '';
-    if (config.useHealth && playerStats.health !== null) {
-        playerHTML += createStatBox('Health', playerStats.health, 'health');
-    }
-    if (config.useLife && playerStats.life !== null) {
-        playerHTML += createStatBox('Life', playerStats.life, 'life');
-    }
-    if (config.useTrophies && playerStats.trophies !== null) {
-        playerHTML += createStatBox('Trophies', playerStats.trophies, 'trophies');
-        document.getElementById('player-trophies').querySelector('.trophy-count').textContent = playerStats.trophies;
-    }
-    playerContainer.innerHTML = playerHTML;
-    
-    // Build opponent stats HTML
-    let opponentHTML = '';
-    if (config.useHealth && opponentStats.health !== null) {
-        opponentHTML += createStatBox('Health', opponentStats.health, 'health');
-    }
-    if (config.useLife && opponentStats.life !== null) {
-        opponentHTML += createStatBox('Life', opponentStats.life, 'life');
-    }
-    if (config.useTrophies && opponentStats.trophies !== null) {
-        opponentHTML += createStatBox('Trophies', opponentStats.trophies, 'trophies');
-        document.getElementById('opponent-trophies').querySelector('.trophy-count').textContent = opponentStats.trophies;
-    }
-    opponentContainer.innerHTML = opponentHTML;
-}
+function setupBattleUI() {
+    const zone = document.getElementById('battle-zone');
+    zone.innerHTML = '';
 
-function createStatBox(label, value, type) {
-    const colorClass = type === 'health' ? 'health-stat' : type === 'life' ? 'life-stat' : 'trophy-stat';
-    return `
-        <div class="stat-box ${colorClass}">
-            <span class="stat-value">${value}</span>
-            <span class="stat-label">${label}</span>
-        </div>
+    // Create UI based on Config
+    if (battleConfig.useHp) {
+        createHpBoxes(zone);
+    }
+
+    if (battleConfig.useLife) {
+        createLifeDisplay(zone);
+    }
+
+    if (battleConfig.useTrophies) {
+        createTrophyDisplay(zone);
+    }
+
+    // Always Add Tools
+    createTools(zone);
+
+    // Add Turn Controls
+    const controls = document.createElement('div');
+    controls.className = 'turn-controls';
+    controls.innerHTML = `
+        <button class="btn btn-primary" id="end-turn-btn" onclick="endTurn()">End Turn</button>
     `;
+    zone.appendChild(controls);
 }
 
-// Stat adjustment functions
-async function adjustPlayerStat(statType, operation) {
-    const amount = parseInt(document.getElementById('health-amount').value) || 1;
-    const actualStat = statType === 'health' && config.useLife ? 'life' : statType;
-    
-    if (operation === 'add') {
-        playerStats[actualStat] = (playerStats[actualStat] || 0) + amount;
-    } else {
-        playerStats[actualStat] = Math.max(0, (playerStats[actualStat] || 0) - amount);
+function createHpBoxes(container) {
+    const count = battleConfig.hpCount || 20;
+    const hpPerBox = battleConfig.hpValue || 20;
+    const totalHp = count * hpPerBox;
+
+    // Store Max for Reference
+    myStats.maxHp = totalHp;
+    opponentStats.maxHp = totalHp;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'hp-boxes';
+
+    for (let i = 0; i < count; i++) {
+        const box = document.createElement('div');
+        box.className = 'hp-box';
+        box.dataset.index = i;
+
+        // Calculate HP range for this Box
+        const boxStart = totalHp - ((i + 1) * hpPerBox);
+        const boxEnd = totalHp - (i * hpPerBox);
+
+        box.innerHTML = `
+            <div class="hp-value">${boxStart}-${boxEnd}</div>
+            <div class="hp-buttons">
+                <button class="hp-btn" onclick="modifyHp(-${hpPerBox})">-</button>
+                <button class="hp-btn" onclick="modifyHp(-1)">-1</button>
+                <button class="hp-btn" onclick="modifyHp(1)">+1</button>
+                <button class="hp-btn" onclick="modifyHp(${hpPerBox})">+${hpPerBox}</button>
+            </div>
+        `;
+
+        wrapper.appendChild(box);
     }
-    
-    await syncStats();
-    updateStatsDisplay();
-    checkWinCondition();
-    
-    addLogEntry('player', `${operation === 'add' ? 'Gained' : 'Lost'} ${amount} ${actualStat}`);
+
+    container.appendChild(wrapper);
+    updateHpDisplay();
 }
 
-async function adjustOpponentStat(statType, operation) {
-    const amount = parseInt(document.getElementById('health-amount').value) || 1;
-    const actualStat = statType === 'health' && config.useLife ? 'life' : statType;
-    
-    if (operation === 'add') {
-        opponentStats[actualStat] = (opponentStats[actualStat] || 0) + amount;
-    } else {
-        opponentStats[actualStat] = Math.max(0, (opponentStats[actualStat] || 0) - amount);
+function createLifeDisplay(container) {
+    const display = document.createElement('div');
+    display.className = 'life-display';
+    display.id = 'life-display';
+    display.textContent = myStats.life || 8000;
+
+    const buttons = document.createElement('div');
+    buttons.className = 'life-buttons';
+    buttons.innerHTML = `
+        <button class="btn btn-health" onclick="modifyLife(-1000)">-1000</button>
+        <button class="btn btn-health" onclick="modifyLife(-100)">-100</button>
+        <button class="btn btn-health" onclick="modifyLife(100)">+100</button>
+        <button class="btn btn-health" onclick="modifyLife(1000)">+1000</button>
+    `;
+
+    container.appendChild(display);
+    container.appendChild(buttons);
+    updateLifeDisplay();
+}
+
+function createTrophyDisplay(container) {
+    const display = document.createElement('div');
+    display.className = 'trophy-display';
+
+    const count = battleConfig.trophyCount || 6;
+
+    for (let i = 0; i < count; i++) {
+        const card = document.createElement('div');
+        card.className = 'trophy-card';
+        card.dataset.index = i;
+        card.innerHTML = `<div class="trophy-icon">🏆</div>`;
+        card.onclick = () => modifyTrophies(1);
+        display.appendChild(card);
     }
-    
-    await syncStats();
-    updateStatsDisplay();
-    checkWinCondition();
-    
-    addLogEntry('player', `${operation === 'add' ? 'Healed opponent' : 'Damaged opponent'} for ${amount} ${actualStat}`);
+
+    container.appendChild(display);
+    updateTrophyDisplay();
 }
 
-async function awardTrophy(target) {
-    const stats = target === 'player' ? playerStats : opponentStats;
-    stats.trophies = (stats.trophies || 0) + 1;
-    
-    await syncStats();
-    updateStatsDisplay();
-    checkWinCondition();
-    
-    addLogEntry(target === 'player' ? 'player' : 'opponent', `Awarded a trophy! (${stats.trophies} total)`);
-}
+function createTools(container) {
+    const panel = document.createElement('div');
+    panel.className = 'controls-panel';
 
-async function syncStats() {
-    const updateData = {};
-    
-    if (isHost) {
-        if (config.useHealth) updateData.player1_health = playerStats.health;
-        if (config.useLife) updateData.player1_life = playerStats.life;
-        if (config.useTrophies) updateData.player1_trophies = playerStats.trophies;
-        if (config.useHealth) updateData.player2_health = opponentStats.health;
-        if (config.useLife) updateData.player2_life = opponentStats.life;
-        if (config.useTrophies) updateData.player2_trophies = opponentStats.trophies;
-    } else {
-        if (config.useHealth) updateData.player2_health = playerStats.health;
-        if (config.useLife) updateData.player2_life = playerStats.life;
-        if (config.useTrophies) updateData.player2_trophies = playerStats.trophies;
-        if (config.useHealth) updateData.player1_health = opponentStats.health;
-        if (config.useLife) updateData.player1_life = opponentStats.life;
-        if (config.useTrophies) updateData.player1_trophies = opponentStats.trophies;
+    // Dice Tool
+    if (battleConfig.useDice) {
+        const diceTool = document.createElement('div');
+        diceTool.className = 'control-group';
+        diceTool.innerHTML = `
+            <h4>🎲 Dice Roller</h4>
+            <div class="tool-buttons">
+                ${[4,6,8,10,12,20].map(s => `<button class="btn btn-tool" onclick="rollDice(${s})">d${s}</button>`).join('')}
+            </div>
+            <div class="dice-result" id="dice-result">-</div>
+        `;
+        panel.appendChild(diceTool);
     }
-    
+
+    // Coin Tool
+    if (battleConfig.useCoins) {
+        const coinTool = document.createElement('div');
+        coinTool.className = 'control-group';
+        coinTool.innerHTML = `
+            <h4>🪙 Coin Flip</h4>
+            <button class="btn btn-tool btn-large" onclick="flipCoin()">Flip Coin</button>
+            <div class="coin-result" id="coin-result">-</div>
+        `;
+        panel.appendChild(coinTool);
+    }
+
+    container.appendChild(panel);
+}
+
+// Update Functions
+function updateUI() {
+    // Update HP or Life
+    if (battleConfig.useHp) {
+        updateHpDisplay();
+    } else if (battleConfig.useLife) {
+        updateLifeDisplay();
+    }
+
+    // Update Trophies
+    if (battleConfig.useTrophies) {
+        updateTrophyDisplay();
+    }
+
+    // Update Turn Indicator
+    const indicator = document.getElementById('turn-display');
+    indicator.textContent = currentTurn === myPlayerNum ? 'Your Turn' : 'Opponent Turn';
+    indicator.className = currentTurn === myPlayerNum ? 'turn-display active' : 'turn-display';
+
+    // Update Button State
+    const endTurnBtn = document.getElementById('end-turn-btn');
+    if (endTurnBtn) {
+        endTurnBtn.disabled = currentTurn !== myPlayerNum;
+    }
+}
+
+function updateHpDisplay() {
+    if (!battleConfig.useHp) return;
+
+    const boxes = document.querySelectorAll('.hp-box');
+    const totalHp = (battleConfig.hpCount || 20) * (battleConfig.hpValue || 20);
+    const myHp = myStats.hp || totalHp;
+    const opponentHp = opponentStats.hp || totalHp;
+
+    boxes.forEach((box, index) => {
+        const boxStart = totalHp - ((index + 1) * (battleConfig.hpValue || 20));
+        const boxEnd = totalHp - (index * (battleConfig.hpValue || 20));
+        const isPlayerBox = myHp >= boxStart && myHp <= boxEnd;
+        const isOpponentBox = opponentHp >= boxStart && opponentHp <= boxEnd;
+
+        box.classList.remove('filled', 'empty');
+        if (isPlayerBox || isOpponentBox) {
+            box.classList.add('filled');
+        } else {
+            box.classList.add('empty');
+        }
+
+        // Update Value Display
+        const valueDiv = box.querySelector('.hp-value');
+        if (isPlayerBox) {
+            valueDiv.textContent = myHp;
+        } else if (isOpponentBox) {
+            valueDiv.textContent = opponentHp;
+        } else {
+            valueDiv.textContent = `${boxStart}-${boxEnd}`;
+        }
+    });
+}
+
+function updateLifeDisplay() {
+    if (!battleConfig.useLife) return;
+
+    const display = document.getElementById('life-display');
+    if (display) {
+        display.textContent = myStats.life || 8000;
+    }
+}
+
+function updateTrophyDisplay() {
+    if (!battleConfig.useTrophies) return;
+
+    const cards = document.querySelectorAll('.trophy-card');
+    const myCount = myStats.trophies || 0;
+
+    cards.forEach((card, index) => {
+        card.classList.remove('taken');
+        if (index < myCount) {
+            card.classList.add('taken');
+        }
+    });
+}
+
+// Action Functions
+async function modifyHp(change) {
+    if (currentTurn !== myPlayerNum) {
+        alert("Not your turn!");
+        return;
+    }
+
+    const newHp = Math.max(0, (myStats.hp || 0) + change);
+    myStats.hp = newHp;
+
+    // Sync to Server
+    const updateData = myPlayerNum === 1 ? { player1_health: newHp } : { player2_health: newHp };
     await supabase.from('battles').update(updateData).eq('id', battleId);
+
+    updateUI();
+    checkWinCondition();
+    addLogEntry('player', `${change > 0 ? 'Gained' : 'Lost'} ${Math.abs(change)} HP`);
 }
 
-// Tools
+async function modifyLife(change) {
+    if (currentTurn !== myPlayerNum) {
+        alert("Not your turn!");
+        return;
+    }
+
+    const newLife = Math.max(0, (myStats.life || 8000) + change);
+    myStats.life = newLife;
+
+    // Sync to Server
+    const updateData = myPlayerNum === 1 ? { player1_life: newLife } : { player2_life: newLife };
+    await supabase.from('battles').update(updateData).eq('id', battleId);
+
+    updateUI();
+    checkWinCondition();
+    addLogEntry('player', `${change > 0 ? 'Gained' : 'Lost'} ${Math.abs(change)} Life Points`);
+}
+
+async function modifyTrophies(change) {
+    if (currentTurn !== myPlayerNum) {
+        alert("Not your turn!");
+        return;
+    }
+
+    const newTrophies = Math.max(0, Math.min((myStats.trophies || 0) + change, battleConfig.trophyCount || 6));
+    myStats.trophies = newTrophies;
+
+    // Sync to Server
+    const updateData = myPlayerNum === 1 ? { player1_trophies: newTrophies } : { player2_trophies: newTrophies };
+    await supabase.from('battles').update(updateData).eq('id', battleId);
+
+    updateUI();
+    checkWinCondition();
+    addLogEntry('player', `Trophy ${change > 0 ? 'claimed' : 'lost'}!`);
+}
+
 function rollDice(sides) {
     const result = Math.floor(Math.random() * sides) + 1;
-    document.getElementById('dice-result').textContent = `🎲 d${sides}: ${result}`;
+    const resultDiv = document.getElementById('dice-result');
+    if (resultDiv) {
+        resultDiv.textContent = `🎲 Rolled: ${result}`;
+        resultDiv.classList.add('rolling');
+        setTimeout(() => resultDiv.classList.remove('rolling'), 500);
+    }
     addLogEntry('system', `Rolled d${sides}: ${result}`);
 }
 
 function flipCoin() {
     const result = Math.random() < 0.5 ? 'Heads' : 'Tails';
-    document.getElementById('coin-result').textContent = `🪙 ${result}`;
+    const resultDiv = document.getElementById('coin-result');
+    if (resultDiv) {
+        resultDiv.textContent = `🪙 ${result}`;
+    }
     addLogEntry('system', `Coin flip: ${result}`);
 }
 
-function startTimer() {
-    if (timerInterval) clearInterval(timerInterval);
-    timeRemaining = 60;
-    
-    timerInterval = setInterval(() => {
-        timeRemaining--;
-        document.getElementById('timer-display').textContent = timeRemaining;
-        
-        if (timeRemaining <= 0) {
-            clearInterval(timerInterval);
-            addLogEntry('system', 'Turn timer expired!');
-            alert('Time\'s up!');
-        }
-    }, 1000);
-    
-    addLogEntry('system', 'Turn timer started (60 seconds)');
-}
+async function endTurn() {
+    if (currentTurn !== myPlayerNum) return;
 
-function endTurn() {
-    if (timerInterval) clearInterval(timerInterval);
+    const nextTurn = myPlayerNum === 1 ? 2 : 1;
+
+    await supabase.from('battles').update({ current_turn: nextTurn }).eq('id', battleId);
+
     addLogEntry('system', 'Turn ended');
-    // Would sync turn change here
 }
 
-// Win condition check
 function checkWinCondition() {
-    let playerWon = false;
-    let opponentWon = false;
-    let winReason = '';
-    
-    if (config.winCondition === 'zero') {
-        // Win by reducing opponent to zero
-        if (config.useHealth && opponentStats.health === 0) {
-            playerWon = true;
-            winReason = 'Health depleted';
-        }
-        if (config.useLife && opponentStats.life === 0) {
-            playerWon = true;
-            winReason = 'Life reached zero';
-        }
-        if (config.useHealth && playerStats.health === 0) {
-            opponentWon = true;
-            winReason = 'Your health depleted';
-        }
-        if (config.useLife && playerStats.life === 0) {
-            opponentWon = true;
-            winReason = 'Your life reached zero';
-        }
-    } else if (config.winCondition === 'max') {
-        // Win by reaching max value
-        const max = config.startValue * 2;
-        if (config.useHealth && playerStats.health >= max) {
-            playerWon = true;
-            winReason = `Reached ${max} health`;
-        }
-        if (config.useLife && playerStats.life >= max) {
-            playerWon = true;
-            winReason = `Reached ${max} life`;
-        }
-    } else if (config.winCondition === 'trophies') {
-        // Win by collecting all trophies
-        const needed = config.startValue; // startValue used as trophy target
-        if (playerStats.trophies >= needed) {
-            playerWon = true;
-            winReason = `Collected ${needed} trophies`;
-        }
-        if (opponentStats.trophies >= needed) {
-            opponentWon = true;
-            winReason = `Opponent collected ${needed} trophies`;
+    let winner = null;
+    let reason = '';
+
+    // Check HP
+    if (battleConfig.useHp) {
+        if (myStats.hp <= 0) {
+            winner = myPlayerNum === 1 ? 2 : 1;
+            reason = 'HP depleted';
+        } else if (opponentStats.hp <= 0) {
+            winner = myPlayerNum;
+            reason = 'Opponent HP depleted';
         }
     }
-    
-    if (playerWon) {
-        showWinModal(true, winReason);
-    } else if (opponentWon) {
-        showWinModal(false, winReason);
+
+    // Check Life Points
+    if (battleConfig.useLife) {
+        if (myStats.life <= 0) {
+            winner = myPlayerNum === 1 ? 2 : 1;
+            reason = 'Life Points depleted';
+        } else if (opponentStats.life <= 0) {
+            winner = myPlayerNum;
+            reason = 'Opponent Life Points depleted';
+        }
+    }
+
+    // Check Trophies
+    if (battleConfig.useTrophies) {
+        const target = battleConfig.trophyCount || 6;
+        if (myStats.trophies >= target) {
+            winner = myPlayerNum;
+            reason = 'All trophies claimed';
+        } else if (opponentStats.trophies >= target) {
+            winner = myPlayerNum === 1 ? 2 : 1;
+            reason = 'Opponent claimed all trophies';
+        }
+    }
+
+    if (winner) {
+        endBattle(winner, reason);
     }
 }
 
-function showWinModal(victory, reason) {
+async function endBattle(winner, reason) {
+    const iWon = winner === myPlayerNum;
+
+    // Get current user
+    const user = await getCurrentUser();
+    const winnerId = iWon ? user.id : null; // Note: In production, fetch opponent ID properly
+
+    // Update battle status
+    await supabase.from('battles').update({
+        status: 'completed',
+        winner_id: winnerId,
+        ended_at: new Date().toISOString()
+    }).eq('id', battleId);
+
+    // Show win modal
     const modal = document.getElementById('win-modal');
     const title = document.getElementById('win-title');
     const message = document.getElementById('win-message');
     const stats = document.getElementById('win-stats');
-    
-    if (victory) {
-        title.textContent = 'VICTORY! 🏆';
+
+    if (iWon) {
+        title.textContent = '🏆 Victory!';
         title.style.color = 'var(--success)';
-        message.textContent = `You defeated your opponent! ${reason}`;
+        message.textContent = `You won by ${reason}!`;
+
+        // Update profile stats
+        await supabase.rpc('increment_wins', { user_id: user.id });
     } else {
-        title.textContent = 'DEFEAT...';
+        title.textContent = '💀 Defeat';
         title.style.color = 'var(--accent)';
-        message.textContent = `You have fallen. ${reason}`;
+        message.textContent = `You lost by ${reason}`;
     }
-    
-    // Build final stats
-    let statsHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0;">';
-    statsHTML += `<div><strong>You:</strong> ${config.useHealth ? playerStats.health + ' HP' : ''} ${config.useLife ? playerStats.life + ' Life' : ''} ${config.useTrophies ? playerStats.trophies + ' 🏆' : ''}</div>`;
-    statsHTML += `<div><strong>Opponent:</strong> ${config.useHealth ? opponentStats.health + ' HP' : ''} ${config.useLife ? opponentStats.life + ' Life' : ''} ${config.useTrophies ? opponentStats.trophies + ' 🏆' : ''}</div>`;
-    statsHTML += '</div>';
-    stats.innerHTML = statsHTML;
-    
+
+    stats.innerHTML = `
+        <div class="stat-row"><span>Final HP:</span><span>${myStats.hp || myStats.life || myStats.trophies}</span></div>
+        <div class="stat-row"><span>Turns:</span><span>${battleLog.filter(l => l.type === 'system' && l.message.includes('Turn')).length}</span></div>
+    `;
+
     modal.classList.remove('hidden');
-    
-    // Update battle status
-    supabase.from('battles').update({
-        status: 'completed',
-        winner_id: victory ? playerId : opponentId
-    }).eq('id', battleId);
+
+    // Cleanup subscription
+    if (battleSub) {
+        battleSub.unsubscribe();
+    }
 }
 
-// Battle log
-function addLogEntry(type, message) {
-    const container = document.getElementById('log-messages');
-    const entry = document.createElement('div');
-    entry.className = `log-entry ${type}`;
-    
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    entry.innerHTML = `<span style="color:var(--text-muted);">[${time}]</span> ${message}`;
-    
-    container.appendChild(entry);
-    container.scrollTop = container.scrollHeight;
-}
-
-function toggleLog() {
-    const log = document.getElementById('log-messages');
-    log.style.display = log.style.display === 'none' ? 'block' : 'none';
-}
-
-function returnToLobby() {
-    window.location.href = 'battle-lobby.html';
-}
-
-// Real-time subscription
 function subscribeToBattle() {
-    supabase
+    battleSub = supabase
         .channel(`battle:${battleId}`)
         .on('postgres_changes',
             { event: 'UPDATE', schema: 'public', table: 'battles', filter: `id=eq.${battleId}` },
-            (payload) => {
+            async (payload) => {
                 const newData = payload.new;
-                
-                // Update opponent stats from server
-                if (isHost) {
-                    if (config.useHealth) opponentStats.health = newData.player2_health;
-                    if (config.useLife) opponentStats.life = newData.player2_life;
-                    if (config.useTrophies) opponentStats.trophies = newData.player2_trophies;
-                } else {
-                    if (config.useHealth) opponentStats.health = newData.player1_health;
-                    if (config.useLife) opponentStats.life = newData.player1_life;
-                    if (config.useTrophies) opponentStats.trophies = newData.player1_trophies;
+
+                // Update turn
+                if (newData.current_turn !== undefined) {
+                    currentTurn = newData.current_turn;
                 }
-                
-                updateStatsDisplay();
-                checkWinCondition();
+
+                // Update opponent stats
+                if (myPlayerNum === 1) {
+                    opponentStats.hp = newData.player2_health;
+                    opponentStats.life = newData.player2_life;
+                    opponentStats.trophies = newData.player2_trophies;
+                } else {
+                    opponentStats.hp = newData.player1_health;
+                    opponentStats.life = newData.player1_life;
+                    opponentStats.trophies = newData.player1_trophies;
+                }
+
+                // Check if battle ended
+                if (newData.status === 'completed') {
+                    if (!document.getElementById('win-modal').classList.contains('hidden')) return;
+
+                    const user = await getCurrentUser();
+                    const iWon = newData.winner_id === user.id;
+
+                    const modal = document.getElementById('win-modal');
+                    const title = document.getElementById('win-title');
+                    const message = document.getElementById('win-message');
+
+                    if (iWon) {
+                        title.textContent = '🏆 Victory!';
+                        message.textContent = 'Opponent conceded or was defeated!';
+                    } else {
+                        title.textContent = '💀 Defeat';
+                        message.textContent = 'Better luck next time!';
+                    }
+
+                    modal.classList.remove('hidden');
+                    return;
+                }
+
+                updateUI();
             }
         )
         .subscribe();
 }
 
-// Initialize
+function addLogEntry(type, message) {
+    const container = document.getElementById('log-messages');
+    const entry = document.createElement('div');
+    entry.className = `log-entry ${type}`;
+
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    entry.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+
+    container.appendChild(entry);
+    container.scrollTop = container.scrollHeight;
+
+    battleLog.push({ type, message, time });
+}
+
+function toggleLog() {
+    const log = document.getElementById('battle-log');
+    log.classList.toggle('collapsed');
+}
+
+function returnToLobby() {
+    if (battleSub) {
+        battleSub.unsubscribe();
+    }
+    window.location.href = 'battle-lobby.html';
+}
+
+// Initialize on load
 initBattle();

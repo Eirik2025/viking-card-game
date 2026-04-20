@@ -10,11 +10,16 @@
     margin-bottom: 0.5rem;
 }
 
-.game-styles {
+.lobby-header p {
+    color: var(--text-muted);
+}
+
+/* Styles Grid */
+.styles-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
 }
 
 .style-card {
@@ -25,6 +30,7 @@
     text-align: center;
     cursor: pointer;
     transition: all 0.3s;
+    position: relative;
 }
 
 .style-card:hover {
@@ -35,112 +41,127 @@
 
 .style-card.selected {
     border-color: var(--primary);
-    background: rgba(201, 162, 39, 0.1);
+    background: rgba(201, 162, 39, 0.15);
 }
 
-.style-icon {
-    font-size: 3rem;
+.Style-Card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: var(--success);
+    font-size: 1.5rem;
+}
+
+.style-Icon {
+    font-size: 3.5rem;
     margin-bottom: 1rem;
 }
 
-.style-card h3 {
+.Style-Card h3 {
     color: var(--primary);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.3rem;
 }
 
-.style-card > p {
+.Style-Features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    display: inline-block;
+}
+
+.Style-Features li {
+    padding: 0.25rem 0;
     color: var(--text-muted);
     font-size: 0.9rem;
-    margin-bottom: 1rem;
 }
 
-.style-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    justify-content: center;
+.Style-Features li::before {
+    content: '• ';
+    color: var(--primary);
 }
 
-.tag {
-    background: rgba(255,255,255,0.1);
-    padding: 0.25rem 0.75rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
+/* Configuration Panel */
 .config-panel {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.08);
     border-radius: 16px;
     padding: 2rem;
     margin-bottom: 2rem;
+    border: 1px solid var(--border);
 }
 
 .config-panel h2 {
     color: var(--primary);
     margin-bottom: 1.5rem;
     text-align: center;
+    font-size: 1.5rem;
 }
 
 .config-section {
     margin-bottom: 2rem;
-    padding-bottom: 2rem;
+    padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--border);
 }
 
-.config-section:last-of-type {
+.config-Section:last-child {
     border-bottom: none;
+    margin-bottom: 0;
 }
 
-.config-section h3 {
+.Config-Section h3 {
     color: var(--text);
     margin-bottom: 1rem;
     font-size: 1.1rem;
 }
 
-.config-options {
-    display: flex;
-    flex-wrap: wrap;
+/* Config Grid */
+.config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
+    margin-top: 1rem;
 }
 
-.config-checkbox {
+.Config-checkbox {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
+    gap: 0.75rem;
+    padding: 0.75rem;
     background: rgba(255,255,255,0.05);
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
 }
 
-.config-checkbox:hover {
+.Config-checkbox:hover {
     background: rgba(255,255,255,0.1);
 }
 
-.config-checkbox input {
-    width: 18px;
-    height: 18px;
+.Config-checkbox input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
     accent-color: var(--primary);
+    cursor: pointer;
 }
 
-.config-inputs {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+/* Config Rows */
+.Config-row {
+    display: flex;
+    align-items: center;
     gap: 1rem;
-    margin-top: 1rem;
+    margin-bottom: 1rem;
 }
 
-.input-group label {
-    display: block;
+.Config-row label {
     color: var(--text-muted);
     font-size: 0.9rem;
-    margin-bottom: 0.5rem;
+    min-width: 120px;
 }
 
-.input-group input {
-    width: 100%;
+.Config-row select, .Config-row input[type="number"] {
+    flex: 1;
     padding: 0.75rem;
     background: rgba(255,255,255,0.1);
     border: 1px solid var(--border);
@@ -149,13 +170,102 @@
     font-family: inherit;
 }
 
-.config-actions {
+.Config-row select:focus, .Config-row input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* Color Selection */
+.color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.color-option {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.Color-Option:hover {
+    transform: scale(1.1);
+    border-color: white;
+}
+
+.Color-Option.selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 10px var(--primary);
+}
+
+.Color-Option.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px black;
+}
+
+/* Vigor Colors (14) */
+.Vigor-Colors .color-option:nth-child(1) { background: #e74c3c; } /* Red */
+.Vigor-Colors .color-option:nth-child(2) { background: #f39c12; } /* Orange */
+.Vigor-Colors .color-option:nth-child(3) { background: #f1c40f; } /* Yellow */
+.Vigor-Colors .color-option:nth-child(4) { background: #27ae60; } /* Green */
+.Vigor-Colors .color-option:nth-child(5) { background: #2980b9; } /* Blue */
+.Vigor-Colors .color-option:nth-child(6) { background: #8e44ad; } /* Purple */
+.Vigor-Colors .color-option:nth-child(7) { background: #2c3e50; } /* Dark */
+.Vigor-Colors .color-option:nth-child(8) { background: #ecf0f1; color: #333; } /* White */
+.Vigor-Colors .color-option:nth-child(9) { background: #95a5a6; } /* Gray */
+.Vigor-Colors .color-option:nth-child(10) { background: #d35400; } /* Pumpkin */
+.Vigor-Colors .color-option:nth-child(11) { background: #c0392b; } /* Pomegranate */
+.Vigor-Colors .color-option:nth-child(12) { background: #16a085; } /* Teal */
+.Vigor-Colors .color-option:nth-child(13) { background: #2ecc71; } /* Emerald */
+.Vigor-Colors .color-option:nth-child(14) { background: #3498db; } /* Sky */
+
+/* Mana Colors (5) */
+.Mana-colors .color-option:nth-child(1) { background: #e74c3c; } /* Red */
+.Mana-colors .color-option:nth-child(2) { background: #f39c12; } /* Orange */
+.Mana-colors .color-option:nth-child(3) { background: #f1c40f; } /* Yellow */
+.Mana-colors .color-option:nth-child(4) { background: #27ae60; } /* Green */
+.Mana-colors .color-option:nth-child(5) { background: #2980b9; } /* Blue */
+
+/* Type Colors (18) - Gradient Spectrum */
+.Type-colors .color-option:nth-child(1) { background: hsl(0, 70%, 50%); }
+.Type-colors .color-option:nth-child(2) { background: hsl(20, 70%, 50%); }
+.Type-colors .color-option:nth-child(3) { background: hsl(40, 70%, 50%); }
+.Type-colors .color-option:nth-child(4) { background: hsl(60, 70%, 50%); }
+.Type-colors .color-option:nth-child(5) { background: hsl(80, 70%, 50%); }
+.Type-colors .color-option:nth-child(6) { background: hsl(100, 70%, 50%); }
+.Type-colors .color-option:nth-child(7) { background: hsl(120, 70%, 50%); }
+.Type-colors .color-option:nth-child(8) { background: hsl(140, 70%, 50%); }
+.Type-colors .color-option:nth-child(9) { background: hsl(160, 70%, 50%); }
+.Type-colors .color-option:nth-child(10) { background: hsl(180, 70%, 50%); }
+.Type-colors .color-option:nth-child(11) { background: hsl(200, 70%, 50%); }
+.Type-colors .color-option:nth-child(12) { background: hsl(220, 70%, 50%); }
+.Type-colors .color-option:nth-child(13) { background: hsl(240, 70%, 50%); }
+.Type-colors .color-option:nth-child(14) { background: hsl(260, 70%, 50%); }
+.Type-colors .color-option:nth-child(15) { background: hsl(280, 70%, 50%); }
+.Type-colors .color-option:nth-child(16) { background: hsl(300, 70%, 50%); }
+.Type-colors .color-option:nth-child(17) { background: hsl(320, 70%, 50%); }
+.Type-colors .color-option:nth-child(18) { background: hsl(340, 70%, 50%); }
+
+/* Config Actions */
+.Config-actions {
     display: flex;
     gap: 1rem;
     justify-content: center;
     margin-top: 2rem;
 }
 
+/* Code Display */
 .code-display {
     text-align: center;
     padding: 3rem;
@@ -173,23 +283,26 @@
     flex-wrap: wrap;
 }
 
-.code-label {
+.code-Label {
     color: var(--text-muted);
+    font-size: 0.9rem;
 }
 
-.code-value {
-    font-size: 3rem;
+.Code-Value {
+    font-size: 2.5rem;
     font-weight: bold;
     color: var(--primary);
-    letter-spacing: 0.5rem;
+    letter-spacing: 0.3rem;
     font-family: monospace;
 }
 
-.waiting-text {
+.Waiting-Text {
     color: var(--warning);
     margin-bottom: 1rem;
+    font-style: italic;
 }
 
+/* Join Section */
 .join-section {
     text-align: center;
     padding: 2rem;
@@ -203,14 +316,14 @@
     margin-bottom: 1rem;
 }
 
-.join-box {
+.Join-Box {
     display: flex;
     gap: 1rem;
     max-width: 400px;
     margin: 0 auto;
 }
 
-.join-box input {
+.Join-Box input {
     flex: 1;
     padding: 1rem;
     background: rgba(255,255,255,0.1);

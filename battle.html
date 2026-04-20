@@ -10,126 +10,40 @@
 </head>
 <body>
     <div class="battle-container">
-        <!-- Battle Header -->
+        <!-- Header -->
         <div class="battle-header">
-            <div class="player-section" id="player-section">
-                <div class="player-avatar">
-                    <img id="player-avatar" src="" alt="">
+            <div class="player-area" id="player-area">
+                <div class="player-identity">
+                    <img id="player-avatar" src="" alt="You">
+                    <div class="player-details">
+                        <h2 id="player-name">You</h2>
+                        <div class="stat-badges" id="player-badges"></div>
+                    </div>
                 </div>
-                <div class="player-info">
-                    <h2 id="player-name">You</h2>
-                    <div class="player-stats" id="player-stats"></div>
-                </div>
+                <div class="player-resources" id="player-resources"></div>
             </div>
             
-            <div class="battle-center">
+            <div class="battle-info">
+                <div class="turn-display" id="turn-display">Your Turn</div>
                 <div class="battle-code" id="display-code">----</div>
-                <div class="turn-indicator" id="turn-indicator">Your Turn</div>
                 <button class="btn btn-primary" id="end-turn-btn" onclick="endTurn()">End Turn</button>
             </div>
             
-            <div class="player-section opponent" id="opponent-section">
-                <div class="player-info">
-                    <h2 id="opponent-name">Opponent</h2>
-                    <div class="player-stats" id="opponent-stats"></div>
+            <div class="player-area opponent" id="opponent-area">
+                <div class="player-identity">
+                    <img id="opponent-avatar" src="" alt="Opponent">
+                    <div class="player-details">
+                        <h2 id="opponent-name">Opponent</h2>
+                        <div class="stat-badges" id="opponent-badges"></div>
+                    </div>
                 </div>
-                <div class="player-avatar">
-                    <img id="opponent-avatar" src="" alt="">
-                </div>
+                <div class="player-resources opponent" id="opponent-resources"></div>
             </div>
         </div>
 
-        <!-- Battle Field -->
-        <div class="battle-field" id="battle-field">
-            <!-- Dynamic content based on game style -->
-        </div>
-
-        <!-- Controls Panel -->
-        <div class="controls-panel" id="controls-panel">
-            <!-- Health/Life Controls -->
-            <div class="control-section" id="health-controls">
-                <h3>Health Control</h3>
-                <div class="increment-box">
-                    <div class="amount-display">
-                        <input type="number" id="health-amount" value="1" min="1" max="20">
-                        <span class="amount-label">Amount</span>
-                    </div>
-                    <div class="increment-buttons">
-                        <button class="btn btn-health" onclick="adjustPlayerStat('health', 'add')">
-                            <span class="btn-icon">+</span>
-                            <span class="btn-text">Add to Me</span>
-                        </button>
-                        <button class="btn btn-health btn-opponent" onclick="adjustPlayerStat('health', 'remove')">
-                            <span class="btn-icon">-</span>
-                            <span class="btn-text">Remove from Me</span>
-                        </button>
-                        <button class="btn btn-health btn-danger" onclick="adjustOpponentStat('health', 'remove')">
-                            <span class="btn-icon">-</span>
-                            <span class="btn-text">Damage Opponent</span>
-                        </button>
-                        <button class="btn btn-health btn-heal" onclick="adjustOpponentStat('health', 'add')">
-                            <span class="btn-icon">+</span>
-                            <span class="btn-text">Heal Opponent</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Trophy Controls -->
-            <div class="control-section hidden" id="trophy-controls">
-                <h3>Trophy/Prize Tracking</h3>
-                <div class="trophy-display">
-                    <div class="trophy-counter" id="player-trophies">
-                        <span class="trophy-icon">🏆</span>
-                        <span class="trophy-count">0</span>
-                        <span class="trophy-label">Your Trophies</span>
-                    </div>
-                    <div class="trophy-vs">VS</div>
-                    <div class="trophy-counter" id="opponent-trophies">
-                        <span class="trophy-icon">🏆</span>
-                        <span class="trophy-count">0</span>
-                        <span class="trophy-label">Opponent Trophies</span>
-                    </div>
-                </div>
-                <div class="trophy-buttons">
-                    <button class="btn btn-trophy" onclick="awardTrophy('player')">🏆 Award Me Trophy</button>
-                    <button class="btn btn-trophy btn-danger" onclick="awardTrophy('opponent')">🏆 Award Opponent</button>
-                </div>
-            </div>
-
-            <!-- Tools Section -->
-            <div class="control-section" id="tools-controls">
-                <h3>Tools & Randomizers</h3>
-                <div class="tools-grid" id="tools-grid">
-                    <!-- Dice -->
-                    <div class="tool-group" id="dice-tool">
-                        <h4>Dice Roller</h4>
-                        <div class="dice-buttons">
-                            <button class="btn btn-dice" onclick="rollDice(4)">d4</button>
-                            <button class="btn btn-dice" onclick="rollDice(6)">d6</button>
-                            <button class="btn btn-dice" onclick="rollDice(8)">d8</button>
-                            <button class="btn btn-dice" onclick="rollDice(10)">d10</button>
-                            <button class="btn btn-dice" onclick="rollDice(12)">d12</button>
-                            <button class="btn btn-dice" onclick="rollDice(20)">d20</button>
-                        </div>
-                        <div class="dice-result" id="dice-result">-</div>
-                    </div>
-
-                    <!-- Coin -->
-                    <div class="tool-group" id="coin-tool">
-                        <h4>Coin Flip</h4>
-                        <button class="btn btn-coin" onclick="flipCoin()">🪙 Flip Coin</button>
-                        <div class="coin-result" id="coin-result">-</div>
-                    </div>
-
-                    <!-- Timer -->
-                    <div class="tool-group hidden" id="timer-tool">
-                        <h4>Turn Timer</h4>
-                        <div class="timer-display" id="timer-display">60</div>
-                        <button class="btn btn-timer" onclick="startTimer()">⏱️ Start</button>
-                    </div>
-                </div>
-            </div>
+        <!-- Battle Zone -->
+        <div class="battle-zone" id="battle-zone">
+            <!-- Dynamic Content Based on Config -->
         </div>
 
         <!-- Battle Log -->
@@ -145,14 +59,15 @@
     <!-- Win Modal -->
     <div id="win-modal" class="modal hidden">
         <div class="modal-content win-content">
-            <h1 id="win-title">VICTORY!</h1>
-            <p id="win-message">You have defeated your opponent!</p>
-            <div class="win-stats" id="win-stats"></div>
-            <button class="btn btn-primary btn-large" onclick="returnToLobby()">Return to Lobby</button>
+            <h1 id="win-title">Victory!</h1>
+            <p id="Win-message"></p>
+            <div class="Win-stats" id="Win-stats"></div>
+            <button class="btn btn-primary btn-large" onclick="ReturnToLobby()">Return to Lobby</button>
         </div>
     </div>
 
     <script type="module" src="js/supabase-client.js"></script>
+    <script type="module" src="js/auth-guard.js"></script>
     <script type="module" src="js/battle.js"></script>
 </body>
 </html>

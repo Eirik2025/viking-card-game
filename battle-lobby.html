@@ -22,140 +22,158 @@
 
     <div class="container">
         <div class="lobby-header">
-            <h1>Choose Your Battle Style</h1>
-            <p>Select a game mode or create a custom battle</p>
+            <h1>Configure Your Battle</h1>
+            <p>Select a battle style and customize your Rules</p>
         </div>
 
-        <div class="game-styles">
-            <!-- Viking Standard -->
-            <div class="style-card" onclick="selectStyle('viking')">
-                <div class="style-icon">🛡️</div>
-                <h3>Viking Standard</h3>
-                <p>20 HP • Dice • Coin Flip</p>
-                <div class="style-tags">
-                    <span class="tag">Health Boxes</span>
-                    <span class="tag">Dice</span>
-                </div>
-            </div>
-
-            <!-- Klandestine/MTG -->
-            <div class="style-card" onclick="selectStyle('mtg')">
+        <!-- Style Selection -->
+        <div class="styles-grid">
+            <!-- 1. Klandestine -->
+            <div class="style-card" onclick="selectStyle('klandestine')">
                 <div class="style-icon">🃏</div>
-                <h3>Klandestine / MTG</h3>
-                <p>20 Life • Commander Damage • Poison</p>
-                <div class="style-tags">
-                    <span class="tag">Life Points</span>
-                    <span class="tag">Multiple Counters</span>
-                </div>
+                <h3>Klandestine</h3>
+                <ul class="style-features">
+                    <li>HP Boxes (14)</li>
+                    <li>Coin Flips</li>
+                    <li>Dice (d4-d20)</li>
+                    <li>14 Vigor Colors</li>
+                </ul>
             </div>
 
-            <!-- Pokemon TCG -->
-            <div class="style-card" onclick="selectStyle('pokemon')">
-                <div class="style-icon">⚡</div>
-                <h3>Pokemon TCG</h3>
-                <p>Prize Cards • Bench • Active</p>
-                <div class="style-tags">
-                    <span class="tag">Prize Cards</span>
-                    <span class="tag">Trophies</span>
-                </div>
+            <!-- 2. Health Box -->
+            <div class="style-card" onclick="selectStyle('healthbox')">
+                <div class="style-icon">❤️</div>
+                <h3>Health Box</h3>
+                <ul class="style-features">
+                    <li>Health Boxes (5)</li>
+                    <li>Dice (d4-d20)</li>
+                    <li>5 Mana Colors</li>
+                </ul>
             </div>
 
-            <!-- Custom -->
+            <!-- 3. Award/Prize -->
+            <div class="style-card" onclick="selectStyle('award')">
+                <div class="style-icon">🏆</div>
+                <h3>Award Battle</h3>
+                <ul class="style-features">
+                    <li>Prize Cards (6)</li>
+                    <li>Coin Flips</li>
+                    <li>18 Type Colors</li>
+                </ul>
+            </div>
+
+            <!-- 4. Life Points -->
+            <div class="style-card" onclick="selectStyle('lifepoints')">
+                <div class="style-icon">💚</div>
+                <h3>Life Points</h3>
+                <ul class="style-features">
+                    <li>8000 Starting Life</li>
+                    <li>Custom Increment</li>
+                    <li>25 Type Colors</li>
+                </ul>
+            </div>
+
+            <!-- 5. Custom -->
             <div class="style-card" onclick="selectStyle('custom')">
                 <div class="style-icon">⚙️</div>
-                <h3>Custom Battle</h3>
-                <p>Build your own setup</p>
-                <div class="style-tags">
-                    <span class="tag">Configurable</span>
-                </div>
+                <h3>Custom Configuration</h3>
+                <ul class="style-features">
+                    <li>Everything Selectable</li>
+                    <li>Full Control</li>
+                </ul>
             </div>
         </div>
 
-        <!-- Configuration Panel (shown when style selected) -->
+        <!-- Configuration Panel -->
         <div id="config-panel" class="config-panel hidden">
-            <h2>Configure Battle</h2>
+            <h2>Battle Configuration</h2>
             
             <div class="config-section">
-                <h3>Health/Life System</h3>
-                <div class="config-options">
+                <h3>Display Options</h3>
+                <div class="config-grid">
                     <label class="config-checkbox">
-                        <input type="checkbox" id="use-health" checked>
-                        <span>Health Boxes</span>
+                        <input type="checkbox" id="use-hp" checked>
+                        <span>HP Boxes</span>
                     </label>
                     <label class="config-checkbox">
-                        <input type="checkbox" id="use-life">
-                        <span>Life Points (Numeric)</span>
+                        <input type="checkbox" id="use-coins" checked>
+                        <span>Coin Flips</span>
                     </label>
-                    <label class="config-checkbox">
-                        <input type="checkbox" id="use-trophies">
-                        <span>Trophy/Prize Tracking</span>
-                    </label>
-                </div>
-                
-                <div class="config-inputs">
-                    <div class="input-group">
-                        <label>Starting Value</label>
-                        <input type="number" id="start-value" value="20" min="1" max="100">
-                    </div>
-                    <div class="input-group">
-                        <label>Increment Step</label>
-                        <input type="number" id="increment-step" value="1" min="1" max="10">
-                    </div>
-                </div>
-            </div>
-
-            <div class="config-section">
-                <h3>Tools & Randomizers</h3>
-                <div class="config-options">
-                    <label class="config-checkbox">
+                    <label class="Config-checkbox">
                         <input type="checkbox" id="use-dice" checked>
-                        <span>Dice Roller (d4-d20)</span>
-                    </label>
-                    <label class="config-checkbox">
-                        <input type="checkbox" id="use-coin" checked>
-                        <span>Coin Flip</span>
-                    </label>
-                    <label class="config-checkbox">
-                        <input type="checkbox" id="use-timer">
-                        <span>Turn Timer</span>
+                        <span>Dice Roller</span>
                     </label>
                 </div>
             </div>
 
             <div class="config-section">
-                <h3>Win Conditions</h3>
-                <div class="config-options">
-                    <label class="config-checkbox">
-                        <input type="radio" name="win-cond" value="zero" checked>
-                        <span>Reach Zero (Death)</span>
-                    </label>
-                    <label class="config-checkbox">
-                        <input type="radio" name="win-cond" value="max">
-                        <span>Reach Max (Victory Points)</span>
-                    </label>
-                    <label class="config-checkbox">
-                        <input type="radio" name="win-cond" value="trophies">
-                        <span>Collect All Trophies</span>
-                    </label>
+                <h3>HP Box Settings</h3>
+                <div class="config-row">
+                    <label>Box Count</label>
+                    <select id="hp-count">
+                        <option value="5">5 Boxes</option>
+                        <option Value="10">10 Boxes</option>
+                        <option Value="20" selected>20 Boxes</option>
+                    </select>
+                </div>
+                <div class="config-row">
+                    <label>HP Per Box</label>
+                    <select id="HP-Value">
+                        <option value="1">1 HP</option>
+                        <option value="5">5 HP</option>
+                        <option value="10">10 HP</option>
+                        <option value="20" selected>20 HP</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="config-section" id="vigor-Section">
+                <h3>Vigor Colors (Klandestine)</h3>
+                <div class="color-grid" id="Vigor-colors"></div>
+            </div>
+
+            <div class="config-section" id="Mana-Section">
+                <h3>Mana Colors (Health Box)</h3>
+                <div class="color-grid" id="Mana-colors"></div>
+            </div>
+
+            <div class="config-section" id="Type-Section">
+                <h3>Type Colors (Award)</h3>
+                <div class="color-grid" id="Type-colors"></div>
+            </div>
+
+            <div class="config-section">
+                <h3>Life Point Settings</h3>
+                <div class="config-row">
+                    <label>Starting Life</label>
+                    <input type="number" id="start-life" value="8000" min="1000" max="20000" step="500">
+                </div>
+                <div class="config-row">
+                    <label>Increment Amount</label>
+                    <select id="Life-Increment">
+                        <option value="100">100</option>
+                        <option value="500">500</option>
+                        <option value="1000" selected>1000</option>
+                    </select>
                 </div>
             </div>
 
             <div class="config-actions">
-                <button class="btn btn-secondary" onclick="backToStyles()">Back</button>
-                <button class="btn btn-primary btn-large" onclick="hostConfiguredBattle()">Host Battle</button>
+                <button class="btn btn-secondary" onclick="BackToStyles()">Back</button>
+                <button class="btn btn-primary btn-large" onclick="HostConfiguredBattle()">Host Battle</button>
             </div>
         </div>
 
         <!-- Battle Code Display -->
         <div id="code-display" class="code-display hidden">
-            <h2>Battle Ready!</h2>
+            <h2>Battle Code</h2>
             <div class="code-box">
-                <span class="code-label">Battle Code</span>
+                <span class="code-label">Share This Code</span>
                 <span class="code-value" id="battle-code">----</span>
-                <button class="btn btn-secondary" onclick="copyCode()">📋 Copy</button>
+                <button class="btn btn-secondary" onclick="CopyCode()">📋 Copy</Button>
             </div>
-            <p class="waiting-text">Waiting for opponent to join...</p>
-            <button class="btn btn-danger" onclick="cancelBattle()">Cancel</button>
+            <p class="waiting-Text">Waiting for opponent...</p>
+            <button class="btn btn-danger" onclick="CancelBattle()">Cancel</Button>
         </div>
 
         <!-- Join Section -->
@@ -163,7 +181,7 @@
             <h2>Join Battle</h2>
             <div class="join-box">
                 <input type="text" id="join-code" placeholder="Enter Battle Code" maxlength="6">
-                <button class="btn btn-primary" onclick="joinBattle()">Join</button>
+                <button class="btn btn-primary" onclick="JoinBattle()">Join</Button>
             </div>
         </div>
     </div>
