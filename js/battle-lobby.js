@@ -264,6 +264,8 @@ function generateBattleCode() {
     return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
+let currentBattleId = null;
+
 async function hostConfiguredBattle() {
     const user = await getCurrentUser();
     if (!user) {
@@ -297,6 +299,8 @@ async function hostConfiguredBattle() {
         return;
     }
     
+    currentBattleId = data.id;
+
     document.getElementById('config-panel').classList.add('hidden');
     document.getElementById('code-display').classList.remove('hidden');
     document.getElementById('battle-code').textContent = code;
@@ -322,17 +326,31 @@ function copyCode() {
 }
 
 async function cancelBattle() {
+    if (!currentBattleId) {
     const code = document.getElementById('battle-code').textContent;
-    
     const { error } = await supabase
         .from('battles')
-        .update({ status: 'cancelled' })
-        .eq('battle_code', code);
-    
-    if (error) {
-        console.error('Cancel error:', error);
+        .select('id')
+        .eq('battle_code', code)
+        .single();
+
+    if (battle) currentBattleId = battle.id;
     }
     
+    if (!currentBattleId) {
+        const { error } = await supabase
+            .from('battles')
+            .delete()
+            .eq('id', currentBattleId);
+
+        if (error) {
+            console.error('Cancel error:', error);
+            alert('Failed to cancel battle: ' + error.message);
+            return;
+        }
+    }
+
+    currentBattleId = null;
     document.getElementById('code-display').classList.add('hidden');
     document.getElementById('join-section').classList.remove('hidden');
 }
