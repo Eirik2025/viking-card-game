@@ -240,12 +240,17 @@ async function sendRequest(friendId) {
                 .update({ status: 'accepted' })
                 .eq('id', row.id);
             
-            // Create reciprocal friendship record
-            await supabase.from('friendships').insert({
-                user_id: user.id,
-                friend_id: friendId,
-                status: 'accepted'
-            }).catch(() => {}); // May already exist
+            // Create reciprocal friendship record - use try/catch instead of .catch()
+            try {
+                await supabase.from('friendships').insert({
+                    user_id: user.id,
+                    friend_id: friendId,
+                    status: 'accepted'
+                });
+            } catch (e) {
+                // Ignore duplicate errors
+                console.log('Reciprocal insert error (expected if exists):', e);
+            }
             
             alert('Friend request accepted! You are now friends.');
             
@@ -290,12 +295,17 @@ async function handleRequest(id, status) {
                 .update({ status: 'accepted' })
                 .eq('id', id);
             
-            // Create our side of the friendship
-            await supabase.from('friendships').insert({
-                user_id: user.id,
-                friend_id: request.user_id,
-                status: 'accepted'
-            }).catch(() => {}); // May already exist
+            // Create our side of the friendship - use try/catch instead of .catch()
+            try {
+                await supabase.from('friendships').insert({
+                    user_id: user.id,
+                    friend_id: request.user_id,
+                    status: 'accepted'
+                });
+            } catch (e) {
+                // Ignore if already exists
+                console.log('Reciprocal insert error (expected if exists):', e);
+            }
         }
         
         // Switch to friends tab and show the new friend
