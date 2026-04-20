@@ -22,75 +22,149 @@
 
     <div class="container">
         <div class="lobby-header">
-            <h1>Choose Your Battle</h1>
-            <p>Host a private match or join with a code</p>
+            <h1>Choose Your Battle Style</h1>
+            <p>Select a game mode or create a custom battle</p>
         </div>
 
-        <div class="lobby-grid">
-            <!-- Host Battle -->
-            <div class="lobby-card host-card">
-                <div class="card-icon">🏰</div>
-                <h2>Host Battle</h2>
-                <p>Create a private room and invite warriors with a battle code</p>
-                
-                <div class="host-options">
-                    <label>Battle Type</label>
-                    <select id="battle-type">
-                        <option value="standard">Standard (20 HP)</option>
-                        <option value="quick">Quick (10 HP)</option>
-                        <option value="epic">Epic (30 HP)</option>
-                    </select>
-                    
-                    <button class="btn btn-primary btn-large" onclick="hostBattle()">
-                        Create Battle Room
-                    </button>
-                </div>
-                
-                <div id="host-code-display" class="code-display hidden">
-                    <div class="code-label">Your Battle Code</div>
-                    <div class="code-value" id="battle-code">----</div>
-                    <button class="btn btn-secondary" onclick="copyCode()">📋 Copy</button>
-                    <p class="waiting-text">Waiting for opponent...</p>
-                    <button class="btn btn-danger" onclick="cancelHost()">Cancel</button>
+        <div class="game-styles">
+            <!-- Viking Standard -->
+            <div class="style-card" onclick="selectStyle('viking')">
+                <div class="style-icon">🛡️</div>
+                <h3>Viking Standard</h3>
+                <p>20 HP • Dice • Coin Flip</p>
+                <div class="style-tags">
+                    <span class="tag">Health Boxes</span>
+                    <span class="tag">Dice</span>
                 </div>
             </div>
 
-            <!-- Join Battle -->
-            <div class="lobby-card join-card">
-                <div class="card-icon">⚔️</div>
-                <h2>Join Battle</h2>
-                <p>Enter a battle code to join a warrior's room</p>
-                
-                <div class="join-form">
-                    <label>Enter Battle Code</label>
-                    <input type="text" id="join-code" placeholder="XXXX" maxlength="6" style="text-transform:uppercase;">
-                    <button class="btn btn-primary btn-large" onclick="joinBattle()">
-                        Enter Battle
-                    </button>
-                </div>
-                
-                <div class="quick-join">
-                    <p>Or <a href="#" onclick="findRandomOpponent()">find a random opponent</a></p>
+            <!-- Klandestine/MTG -->
+            <div class="style-card" onclick="selectStyle('mtg')">
+                <div class="style-icon">🃏</div>
+                <h3>Klandestine / MTG</h3>
+                <p>20 Life • Commander Damage • Poison</p>
+                <div class="style-tags">
+                    <span class="tag">Life Points</span>
+                    <span class="tag">Multiple Counters</span>
                 </div>
             </div>
 
-            <!-- Active Battles -->
-            <div class="lobby-card history-card">
-                <div class="card-icon">📜</div>
-                <h2>Recent Battles</h2>
-                <div id="recent-battles" class="recent-list">
-                    <p class="empty">No recent battles</p>
+            <!-- Pokemon TCG -->
+            <div class="style-card" onclick="selectStyle('pokemon')">
+                <div class="style-icon">⚡</div>
+                <h3>Pokemon TCG</h3>
+                <p>Prize Cards • Bench • Active</p>
+                <div class="style-tags">
+                    <span class="tag">Prize Cards</span>
+                    <span class="tag">Trophies</span>
+                </div>
+            </div>
+
+            <!-- Custom -->
+            <div class="style-card" onclick="selectStyle('custom')">
+                <div class="style-icon">⚙️</div>
+                <h3>Custom Battle</h3>
+                <p>Build your own setup</p>
+                <div class="style-tags">
+                    <span class="tag">Configurable</span>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Join In Progress Modal -->
-    <div id="join-modal" class="modal hidden">
-        <div class="modal-content">
-            <h3>Joining Battle...</h3>
-            <p>Connecting to battle room <span id="join-code-display"></span></p>
-            <div class="loading-spinner"></div>
+        <!-- Configuration Panel (shown when style selected) -->
+        <div id="config-panel" class="config-panel hidden">
+            <h2>Configure Battle</h2>
+            
+            <div class="config-section">
+                <h3>Health/Life System</h3>
+                <div class="config-options">
+                    <label class="config-checkbox">
+                        <input type="checkbox" id="use-health" checked>
+                        <span>Health Boxes</span>
+                    </label>
+                    <label class="config-checkbox">
+                        <input type="checkbox" id="use-life">
+                        <span>Life Points (Numeric)</span>
+                    </label>
+                    <label class="config-checkbox">
+                        <input type="checkbox" id="use-trophies">
+                        <span>Trophy/Prize Tracking</span>
+                    </label>
+                </div>
+                
+                <div class="config-inputs">
+                    <div class="input-group">
+                        <label>Starting Value</label>
+                        <input type="number" id="start-value" value="20" min="1" max="100">
+                    </div>
+                    <div class="input-group">
+                        <label>Increment Step</label>
+                        <input type="number" id="increment-step" value="1" min="1" max="10">
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>Tools & Randomizers</h3>
+                <div class="config-options">
+                    <label class="config-checkbox">
+                        <input type="checkbox" id="use-dice" checked>
+                        <span>Dice Roller (d4-d20)</span>
+                    </label>
+                    <label class="config-checkbox">
+                        <input type="checkbox" id="use-coin" checked>
+                        <span>Coin Flip</span>
+                    </label>
+                    <label class="config-checkbox">
+                        <input type="checkbox" id="use-timer">
+                        <span>Turn Timer</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>Win Conditions</h3>
+                <div class="config-options">
+                    <label class="config-checkbox">
+                        <input type="radio" name="win-cond" value="zero" checked>
+                        <span>Reach Zero (Death)</span>
+                    </label>
+                    <label class="config-checkbox">
+                        <input type="radio" name="win-cond" value="max">
+                        <span>Reach Max (Victory Points)</span>
+                    </label>
+                    <label class="config-checkbox">
+                        <input type="radio" name="win-cond" value="trophies">
+                        <span>Collect All Trophies</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="config-actions">
+                <button class="btn btn-secondary" onclick="backToStyles()">Back</button>
+                <button class="btn btn-primary btn-large" onclick="hostConfiguredBattle()">Host Battle</button>
+            </div>
+        </div>
+
+        <!-- Battle Code Display -->
+        <div id="code-display" class="code-display hidden">
+            <h2>Battle Ready!</h2>
+            <div class="code-box">
+                <span class="code-label">Battle Code</span>
+                <span class="code-value" id="battle-code">----</span>
+                <button class="btn btn-secondary" onclick="copyCode()">📋 Copy</button>
+            </div>
+            <p class="waiting-text">Waiting for opponent to join...</p>
+            <button class="btn btn-danger" onclick="cancelBattle()">Cancel</button>
+        </div>
+
+        <!-- Join Section -->
+        <div class="join-section" id="join-section">
+            <h2>Join Battle</h2>
+            <div class="join-box">
+                <input type="text" id="join-code" placeholder="Enter Battle Code" maxlength="6">
+                <button class="btn btn-primary" onclick="joinBattle()">Join</button>
+            </div>
         </div>
     </div>
 

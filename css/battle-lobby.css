@@ -10,93 +10,171 @@
     margin-bottom: 0.5rem;
 }
 
-.lobby-header p {
-    color: var(--text-muted);
-}
-
-.lobby-grid {
+.game-styles {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    max-width: 1000px;
-    margin: 0 auto;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
 }
 
-.lobby-card {
+.style-card {
     background: rgba(255,255,255,0.05);
-    border: 1px solid var(--border);
+    border: 2px solid var(--border);
     border-radius: 16px;
     padding: 2rem;
     text-align: center;
+    cursor: pointer;
     transition: all 0.3s;
 }
 
-.lobby-card:hover {
+.style-card:hover {
     transform: translateY(-5px);
     border-color: var(--primary);
+    box-shadow: 0 10px 30px rgba(201, 162, 39, 0.2);
 }
 
-.card-icon {
-    font-size: 4rem;
+.style-card.selected {
+    border-color: var(--primary);
+    background: rgba(201, 162, 39, 0.1);
+}
+
+.style-icon {
+    font-size: 3rem;
     margin-bottom: 1rem;
 }
 
-.lobby-card h2 {
+.style-card h3 {
     color: var(--primary);
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 
-.lobby-card > p {
-    color: var(--text-muted);
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-}
-
-.host-options, .join-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    text-align: left;
-}
-
-.host-options label, .join-form label {
+.style-card > p {
     color: var(--text-muted);
     font-size: 0.9rem;
+    margin-bottom: 1rem;
 }
 
-.host-options select, .join-form input {
+.style-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.tag {
+    background: rgba(255,255,255,0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.config-panel {
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.config-panel h2 {
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.config-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.config-section:last-of-type {
+    border-bottom: none;
+}
+
+.config-section h3 {
+    color: var(--text);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.config-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.config-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.config-checkbox:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.config-checkbox input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+}
+
+.config-inputs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.input-group label {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.input-group input {
+    width: 100%;
     padding: 0.75rem;
     background: rgba(255,255,255,0.1);
     border: 1px solid var(--border);
     color: var(--text);
     border-radius: 8px;
     font-family: inherit;
-    font-size: 1rem;
 }
 
-.host-options select:focus, .join-form input:focus {
-    outline: none;
-    border-color: var(--primary);
-}
-
-.btn-large {
-    padding: 1rem;
-    font-size: 1.1rem;
-    margin-top: 0.5rem;
+.config-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
 }
 
 .code-display {
-    margin-top: 1.5rem;
-    padding: 1.5rem;
-    background: rgba(0,0,0,0.3);
-    border-radius: 12px;
-    border: 2px dashed var(--primary);
+    text-align: center;
+    padding: 3rem;
+    background: rgba(201, 162, 39, 0.1);
+    border-radius: 16px;
+    border: 2px solid var(--primary);
+}
+
+.code-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    flex-wrap: wrap;
 }
 
 .code-label {
     color: var(--text-muted);
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
 }
 
 .code-value {
@@ -104,68 +182,47 @@
     font-weight: bold;
     color: var(--primary);
     letter-spacing: 0.5rem;
-    margin-bottom: 1rem;
     font-family: monospace;
 }
 
 .waiting-text {
     color: var(--warning);
-    margin: 1rem 0;
+    margin-bottom: 1rem;
 }
 
-.quick-join {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
+.join-section {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(255,255,255,0.03);
+    border-radius: 16px;
+    margin-top: 2rem;
 }
 
-.quick-join a {
+.join-section h2 {
     color: var(--primary);
-    text-decoration: underline;
+    margin-bottom: 1rem;
 }
 
-.recent-list {
-    text-align: left;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.recent-item {
+.join-box {
     display: flex;
-    justify-content: space-between;
-    padding: 0.75rem;
-    background: rgba(255,255,255,0.05);
+    gap: 1rem;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.join-box input {
+    flex: 1;
+    padding: 1rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid var(--border);
+    color: var(--text);
     border-radius: 8px;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.recent-item .result {
-    color: var(--primary);
-    font-weight: bold;
-}
-
-.recent-item .win { color: var(--success); }
-.recent-item .loss { color: var(--accent); }
-
-.loading-spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--border);
-    border-top-color: var(--primary);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 1rem auto;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
+    font-family: inherit;
+    font-size: 1.2rem;
+    text-align: center;
+    text-transform: uppercase;
 }
 
 .hidden {
     display: none !important;
 }
-
-.host-card { border-top: 4px solid var(--success); }
-.join-card { border-top: 4px solid var(--accent); }
-.history-card { border-top: 4px solid var(--warning); }
