@@ -45,6 +45,7 @@ function renderSidebarContent(tab, items) {
     const container = document.getElementById('sidebar-content');
     container.innerHTML = '';
     
+    // Update tab buttons
     document.querySelectorAll('.sidebar-tab').forEach(t => {
         t.classList.toggle('active', t.dataset.tab === tab);
     });
@@ -113,6 +114,7 @@ function renderSidebarContent(tab, items) {
         items.forEach(r => {
             const item = document.createElement('div');
             item.className = 'request-item';
+            item.id = `request-${r.id}`;
             
             item.innerHTML = `
                 <img src="${r.requester.avatar_url || 'https://placehold.co/40x40/1a1a2e/c9a227?text=' + (r.requester.username?.[0] || '?')}" 
@@ -122,7 +124,7 @@ function renderSidebarContent(tab, items) {
                     <div class="friend-meta">Wants to be your friend</div>
                 </div>
                 <div class="request-actions">
-                    <button class="btn btn-primary btn-sm" onclick="handleRequest('${r.id}', 'accepted')">Accept</button>
+                    <button class="btn btn-primary btn-sm" onclick="handleRequest('${r.id}', 'accepted', '${r.user_id}')">Accept</button>
                     <button class="btn btn-danger btn-sm" onclick="handleRequest('${r.id}', 'declined')">Decline</button>
                 </div>
             `;
@@ -240,7 +242,7 @@ async function sendRequest(friendId) {
                 .update({ status: 'accepted' })
                 .eq('id', row.id);
             
-            // Create reciprocal friendship record - use try/catch instead of .catch()
+            // Create reciprocal friendship record
             try {
                 await supabase.from('friendships').insert({
                     user_id: user.id,
@@ -248,15 +250,14 @@ async function sendRequest(friendId) {
                     status: 'accepted'
                 });
             } catch (e) {
-                // Ignore duplicate errors
                 console.log('Reciprocal insert error (expected if exists):', e);
             }
             
             alert('Friend request accepted! You are now friends.');
             
-            // SWITCH to friends tab and refresh
-            currentTab = 'friends';
-            loadFriends();
+            // Refresh current view
+            if (currentTab === 'friends') loadFriends();
+            else if (currentTab === 'requests') loadRequests();
             return;
         }
     }
@@ -272,60 +273,86 @@ async function sendRequest(friendId) {
         alert('Error: ' + error.message);
     } else {
         alert('Friend request sent!');
-        // Clear search results to prevent double-add
         document.getElementById('player-results').innerHTML = 
-            '<p style="color:var(--success);text-align:center;padding:2rem;">✓ Request sent! Check the Requests tab to see pending requests.</p>';
+            '<p style="color:var(--success);text-align:center;padding:2rem;">✓ Request sent!</p>';
     }
 }
 
-async function handleRequest(id, status) {
+async function handleRequest(id, status, requesterId) {
     const user = await getCurrentUser();
     
     if (status === 'accepted') {
-        // Get the request details
-        const { data: request } = await supabase
+        // Update their request to accepted
+        const { error: updateError } = await supabase
             .from('friendships')
-            .select('*')
-            .eq('id', id)
-            .single();
+            .update({ status: 'accepted' })
+            .eq('id', id);
         
-        if (request) {
-            // Update their request to accepted
-            await supabase.from('friendships')
-                .update({ status: 'accepted' })
-                .eq('id', id);
-            
-            // Create our side of the friendship - use try/catch instead of .catch()
+        if (updateError) {
+            console.error('Update error:', updateError);
+            alert('Failed to accept request');
+            return;
+        }
+        
+        // Create our side of the friendship
+        if (requesterId) {
             try {
                 await supabase.from('friendships').insert({
                     user_id: user.id,
-                    friend_id: request.user_id,
+                    friend_id: requesterId,
                     status: 'accepted'
                 });
             } catch (e) {
-                // Ignore if already exists
                 console.log('Reciprocal insert error (expected if exists):', e);
             }
         }
         
-        // Switch to friends tab and show the new friend
-        currentTab = 'friends';
-        loadFriends();
+        // Remove the request item from DOM immediately
+        const requestEl = document.getElementById(`request-${id}`);
+        if (requestEl) {
+            requestEl.style.opacity = '0';
+            requestEl.style.transform = 'translateX(-20px)';
+            setTimeout(() => requestEl.remove(), 300);
+        }
+        
+        // Reload requests to update count and refresh list
+        setTimeout(async () => {
+            await loadRequests();
+            
+            // If no more requests, the empty state will show
+            // Switch to friends tab to show the new friend
+            currentTab = 'friends';
+            await loadFriends();
+            
+            // Update tab UI
+            document.querySelectorAll('.sidebar-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.tab === 'friends');
+            });
+        }, 350);
+        
     } else {
-        // Decline - just delete
+        // Decline - delete the request
         await supabase.from('friendships').delete().eq('id', id);
-        loadRequests();
+        
+        // Remove from DOM immediately
+        const requestEl = document.getElementById(`request-${id}`);
+        if (requestEl) {
+            requestEl.style.opacity = '0';
+            requestEl.style.transform = 'translateX(20px)';
+            setTimeout(() => requestEl.remove(), 300);
+        }
+        
+        // Refresh after animation
+        setTimeout(() => loadRequests(), 350);
     }
 }
 
 async function openChat(friendId, username, avatarUrl, status) {
     currentChatFriend = friendId;
     
-    // Hide empty state, show chat panel
     document.getElementById('friends-main').innerHTML = '';
     document.getElementById('chat-panel').classList.remove('hidden');
     
-    // Update header
     document.getElementById('chat-with').textContent = username;
     document.getElementById('chat-avatar').src = avatarUrl || 'https://placehold.co/50x50/1a1a2e/c9a227?text=' + (username?.[0] || '?');
     document.getElementById('chat-status').textContent = status || 'offline';
@@ -333,7 +360,6 @@ async function openChat(friendId, username, avatarUrl, status) {
     
     const user = await getCurrentUser();
     
-    // Load messages
     const { data: messages } = await supabase
         .from('private_messages')
         .select('*')
@@ -357,7 +383,6 @@ async function openChat(friendId, username, avatarUrl, status) {
     
     container.scrollTop = container.scrollHeight;
     
-    // Subscribe to new messages
     supabase
         .channel(`chat:${friendId}`)
         .on('postgres_changes', 
@@ -401,7 +426,6 @@ async function sendPrivateMessage() {
     
     const container = document.getElementById('private-messages');
     
-    // Remove "no messages" text if present
     if (container.children.length === 1 && container.children[0].style.textAlign === 'center') {
         container.innerHTML = '';
     }
@@ -423,7 +447,6 @@ async function removeFriend() {
     
     const user = await getCurrentUser();
     
-    // Delete both directions
     await supabase
         .from('friendships')
         .delete()
@@ -432,7 +455,6 @@ async function removeFriend() {
     currentChatFriend = null;
     document.getElementById('chat-panel').classList.add('hidden');
     
-    // Show empty state
     document.getElementById('friends-main').innerHTML = `
         <div class="empty-state">
             <div class="empty-icon">👋</div>
@@ -441,7 +463,6 @@ async function removeFriend() {
         </div>
     `;
     
-    // Refresh friends list
     loadFriends();
 }
 
@@ -451,7 +472,6 @@ document.querySelectorAll('.sidebar-tab').forEach(btn => {
         const tab = e.currentTarget.dataset.tab;
         currentTab = tab;
         
-        // Reset chat view when switching tabs
         currentChatFriend = null;
         document.getElementById('chat-panel').classList.add('hidden');
         document.getElementById('friends-main').innerHTML = `
